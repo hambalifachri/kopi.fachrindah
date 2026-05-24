@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Price List Jador kopi.fachrindah</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Inter:wght@400;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="poster-shell">
+      <section class="poster" aria-label="Price list jador kopi">
+        <header class="poster-hero">
+          <div class="brand-block">
+            <div class="brand-arch">
+              <div class="brand-cups" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+            <h1>kopi.fachrindah</h1>
+            <p>kopi kenangan</p>
+          </div>
+
+          <div class="title-block">
+            <div class="price-word">PRICE</div>
+            <div class="price-word">LIST</div>
+            <div class="brush">JADOR<br />ONLY</div>
+          </div>
+
+          <div class="hero-drink">
+            <div class="big-cup" aria-hidden="true">
+              <i></i>
+              <i></i>
+              <i></i>
+              <b></b>
+            </div>
+            <div class="min-badge">
+              <span>MINIMAL</span>
+              <strong>2</strong>
+              <span>MENU</span>
+            </div>
+          </div>
+        </header>
+
+        <div class="search-panel">
+          <label for="menuSearch">Cari menu</label>
+          <div class="search-row">
+            <input id="menuSearch" type="search" placeholder="Contoh: latte, thai tea, croissant" autocomplete="off" />
+            <button id="clearSearch" type="button" aria-label="Hapus pencarian">×</button>
+          </div>
+          <p id="searchStatus">Ketik nama menu atau kategori.</p>
+        </div>
+        <nav class="category-nav" id="categoryNav" aria-label="Kategori menu"></nav>
+        <div id="catalogContainer"></div>
+
+        <section class="quick-order" id="order">
+          <div class="phone-card" aria-hidden="true">
+            <div class="phone-top"></div>
+            <div class="phone-cup"></div>
+            <span>ORDER</span>
+          </div>
+          <div class="order-title">
+            <strong>ORDER</strong>
+            <strong>VIA DM</strong>
+          </div>
+          <div class="contact-list">
+            <p><span>WA</span> 081281400462</p>
+            <p><span>IG</span> kopi.fachrindah</p>
+          </div>
+        </section>
+
+        <section class="reviews-section" aria-label="Review pelanggan">
+          <div class="reviews-heading">
+            <h2>Review Customer</h2>
+            <p>Dipercaya buat order cepat, rapi, dan pembayaran jelas lewat QRIS.</p>
+          </div>
+          <div class="reviews-grid" id="reviewsGrid">
+            <article>
+              <div class="stars">★★★★★</div>
+              <p>"Order kantor 8 cup aman, detail gula sama ice-nya sesuai semua."</p>
+              <strong>Rani - Sudirman</strong>
+            </article>
+            <article>
+              <div class="stars">★★★★★</div>
+              <p>"Fast response, dikabarin dari checkout sampai pesanan siap."</p>
+              <strong>Dimas - Tebet</strong>
+            </article>
+            <article>
+              <div class="stars">★★★★★</div>
+              <p>"QRIS-nya praktis, tinggal kirim bukti bayar terus diproses."</p>
+              <strong>Naya - Bekasi</strong>
+            </article>
+          </div>
+          <form class="review-form" id="reviewForm">
+            <div class="review-form-title">
+              <strong>Tulis Review</strong>
+              <span>Opsional, boleh isi setelah order selesai.</span>
+            </div>
+            <div class="field-row">
+              <label>
+                Nama
+                <input id="reviewName" name="reviewName" type="text" placeholder="Nama kamu" required />
+              </label>
+              <label>
+                Rating
+                <select id="reviewRating" name="reviewRating" required>
+                  <option value="5">★★★★★ - Puas banget</option>
+                  <option value="4">★★★★☆ - Puas</option>
+                  <option value="3">★★★☆☆ - Cukup</option>
+                </select>
+              </label>
+            </div>
+            <label>
+              Review
+              <textarea id="reviewText" name="reviewText" rows="3" placeholder="Tulis pengalaman order kamu" required></textarea>
+            </label>
+            <button class="review-button" type="submit">Tampilkan Review di Website</button>
+          </form>
+        </section>
+      </section>
+
+      <section class="order-tools" id="checkout" aria-label="Checkout dan pembayaran">
+        <div class="cart-panel">
+          <div class="panel-title">
+            <p>Keranjang</p>
+            <button class="clear-button" id="clearCart" type="button">Kosongkan</button>
+          </div>
+          <div class="cart-items" id="cartItems"></div>
+          <div class="totals">
+            <div>
+              <span>Subtotal menu</span>
+              <strong id="subtotal">Rp0</strong>
+            </div>
+            <div class="grand-total">
+              <span>Total bayar</span>
+              <strong id="grandTotal">Rp0</strong>
+            </div>
+          </div>
+          <div class="payment-panel">
+            <div class="panel-title">
+              <p>Pembayaran QRIS</p>
+            </div>
+            <img src="assets/qris-kopi-fachrindah.jpeg" alt="QRIS kopi.fachrindah" />
+            <p>
+              Scan QRIS sesuai total bayar, lalu upload bukti pembayaran saat checkout.
+            </p>
+          </div>
+        </div>
+
+        <form class="order-form" id="orderForm">
+          <div class="panel-title">
+            <p>Checkout & Biodata</p>
+          </div>
+          <div class="field-row">
+            <label>
+              Nama
+              <input id="customerName" name="customerName" type="text" placeholder="Nama kamu" required />
+            </label>
+            <label>
+              WhatsApp
+              <input id="customerPhone" name="customerPhone" type="tel" placeholder="08xxxxxxxxxx" required />
+            </label>
+          </div>
+          <label>
+            Lokasi outlet
+            <textarea id="customerAddress" name="customerAddress" rows="3" placeholder="Contoh: Kopi Kenangan Grand Indonesia" required></textarea>
+          </label>
+          <label>
+            Catatan
+            <textarea id="orderNote" name="orderNote" rows="2" placeholder="Less ice, gula normal, jam kirim, dll"></textarea>
+          </label>
+          <label>
+            Nomor WA admin
+            <input id="adminPhone" name="adminPhone" type="tel" value="6281281400462" required />
+          </label>
+          <button class="send-button" type="submit">Kirim Order via WhatsApp</button>
+        </form>
+      </section>
+
+      <div class="order-modal" id="orderModal" aria-hidden="true">
+        <div class="modal-backdrop" data-close-modal></div>
+        <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalItemName">
+          <button class="modal-close" id="closeOrderModal" type="button" aria-label="Tutup popup">X</button>
+          <div class="modal-heading">
+            <span>Order kopi.fachrindah</span>
+            <h2 id="modalItemName">Tambah Pesanan</h2>
+          </div>
+
+          <div class="modal-stage" id="modalCustomize">
+            <div class="selected-drink modal-product" id="selectedDrink">
+              <span>Belum pilih menu</span>
+              <strong>Klik tombol Tambah di price list dulu</strong>
+            </div>
+            <div class="modal-options" id="modalOptions">
+              <div class="option-group" data-option-group="temperature">
+                <div class="option-heading">
+                  <strong>Temperature</strong>
+                  <span>Select 1</span>
+                </div>
+                <div class="option-grid two">
+                  <button class="option-card selected" type="button" data-option-value="Ice">
+                    <span class="option-cup ice-cup"></span>
+                    <strong>Ice</strong>
+                  </button>
+                  <button class="option-card" type="button" data-option-value="Hot">
+                    <span class="option-cup hot-cup"></span>
+                    <strong>Hot</strong>
+                  </button>
+                </div>
+              </div>
+              <div class="option-group" data-option-group="size">
+                <div class="option-heading">
+                  <strong>Size</strong>
+                  <span>Select 1</span>
+                </div>
+                <div class="option-grid three">
+                  <button class="option-card selected" type="button" data-option-value="Regular">Regular</button>
+                </div>
+              </div>
+              <div class="option-group" data-option-group="sugar">
+                <div class="option-heading">
+                  <strong>Sugar Level</strong>
+                  <span>Select 1</span>
+                </div>
+                <div class="option-grid three">
+                  <button class="option-card selected" type="button" data-option-value="Normal Sugar">Normal Sugar</button>
+                  <button class="option-card" type="button" data-option-value="Less Sugar">Less Sugar</button>
+                  <button class="option-card" type="button" data-option-value="No Sugar">No Sugar</button>
+                </div>
+              </div>
+              <div class="option-group" data-option-group="ice">
+                <div class="option-heading">
+                  <strong>Ice Level</strong>
+                  <span>Select 1</span>
+                </div>
+                <div class="option-grid three">
+                  <button class="option-card selected" type="button" data-option-value="Normal Ice">Normal Ice</button>
+                  <button class="option-card" type="button" data-option-value="Less Ice">Less Ice</button>
+                  <button class="option-card" type="button" data-option-value="No Ice">No Ice</button>
+                </div>
+              </div>
+            </div>
+            <button class="configure-button" id="addConfiguredItem" type="button" disabled>
+              Tambahkan ke Keranjang
+            </button>
+          </div>
+
+          <div class="modal-stage" id="modalCartStage" hidden>
+            <div class="panel-title">
+              <p>Keranjang</p>
+              <button class="clear-button" id="modalClearCart" type="button">Kosongkan</button>
+            </div>
+            <div class="cart-items" id="modalCartItems"></div>
+            <div class="totals">
+              <div>
+                <span>Subtotal menu</span>
+                <strong id="modalSubtotal">Rp0</strong>
+              </div>
+              <div class="grand-total">
+                <span>Total bayar</span>
+                <strong id="modalGrandTotal">Rp0</strong>
+              </div>
+            </div>
+            <div class="modal-next-actions" id="modalNextActions">
+              <p>Pesanan sudah masuk keranjang. Mau tambah pesanan lagi atau selesai?</p>
+              <div class="modal-choice-row">
+                <button class="secondary-button" id="continueShopping" type="button">Tambah Pesanan Lagi</button>
+                <button class="send-button" id="goCheckout" type="button">Selesai, Bayar QRIS</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-stage modal-checkout" id="modalCheckoutStage" hidden>
+            <div class="panel-title">
+              <p>Checkout</p>
+              <button class="secondary-button compact-button" id="backToCart" type="button">Lihat Keranjang</button>
+            </div>
+            <div class="checkout-summary" id="checkoutSummary"></div>
+            <div class="payment-panel modal-payment">
+              <div class="panel-title">
+                <p>Pembayaran QRIS</p>
+              </div>
+              <img src="assets/qris-kopi-fachrindah.jpeg" alt="QRIS kopi.fachrindah" />
+              <p>Scan QRIS sesuai total bayar, lalu upload bukti. Order akan tersimpan untuk admin.</p>
+            </div>
+            <form class="order-form modal-order-form" id="modalOrderForm">
+              <div class="panel-title">
+                <p>Biodata Customer</p>
+              </div>
+              <div class="field-row">
+                <label>
+                  Nama
+                  <input id="modalCustomerName" name="customerName" type="text" placeholder="Nama kamu" required />
+                </label>
+                <label>
+                  WhatsApp
+                  <input id="modalCustomerPhone" name="customerPhone" type="tel" placeholder="08xxxxxxxxxx" required />
+                </label>
+              </div>
+              <label>
+                Lokasi outlet
+                <textarea id="modalCustomerAddress" name="customerAddress" rows="3" placeholder="Contoh: Kopi Kenangan Grand Indonesia" required></textarea>
+              </label>
+              <label>
+                Catatan
+                <textarea id="modalOrderNote" name="orderNote" rows="2" placeholder="Less ice, gula normal, jam kirim, dll"></textarea>
+              </label>
+              <label>
+                Nomor WA admin
+                <input id="modalAdminPhone" name="adminPhone" type="tel" value="6281281400462" required />
+              </label>
+              <div class="proof-upload">
+                <label>
+                  Upload bukti transfer QRIS
+                  <input id="modalPaymentProof" name="paymentProof" type="file" accept="image/*,.pdf" required />
+                </label>
+                <div class="proof-preview" id="proofPreview">
+                  <span>Belum ada bukti dipilih</span>
+                </div>
+                <button class="secondary-button compact-button" id="shareProofButton" type="button" disabled>
+                  Share Bukti Manual
+                </button>
+                <p class="proof-help" id="proofHelp">
+                  Bukti akan disimpan bersama order. WhatsApp hanya berisi notifikasi dan ID order.
+                </p>
+              </div>
+              <button class="send-button" type="submit">Simpan Order & Notifikasi WhatsApp</button>
+            </form>
+            <form class="review-form modal-review" id="modalReviewForm">
+              <div class="review-form-title">
+                <strong>Review Opsional</strong>
+                <span>Boleh isi sekarang, boleh dilewati.</span>
+              </div>
+              <div class="field-row">
+                <label>
+                  Nama
+                  <input id="modalReviewName" name="reviewName" type="text" placeholder="Nama kamu" required />
+                </label>
+                <label>
+                  Rating
+                  <select id="modalReviewRating" name="reviewRating" required>
+                    <option value="5">★★★★★ - Puas banget</option>
+                    <option value="4">★★★★☆ - Puas</option>
+                    <option value="3">★★★☆☆ - Cukup</option>
+                  </select>
+                </label>
+              </div>
+              <label>
+                Review
+                <textarea id="modalReviewText" name="reviewText" rows="3" placeholder="Tulis pengalaman order kamu" required></textarea>
+              </label>
+              <button class="review-button" type="submit">Tampilkan Review di Website</button>
+            </form>
+          </div>
+        </section>
+      </div>
+
+      <footer class="poster-footer">
+        <span>ORDER PRAKTIS</span>
+        <span>FAST RESPONSE</span>
+        <span>NGOPI BERES</span>
+      </footer>
+      <button class="floating-cart" id="openCartButton" type="button" hidden>
+        <span id="openCartCount">0 menu</span>
+        <strong id="openCartTotal">Rp0</strong>
+      </button>
+      <button class="back-to-top" id="backToTop" type="button" aria-label="Kembali ke atas">↑</button>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
