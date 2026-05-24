@@ -697,6 +697,48 @@ function buildWhatsappMessage(formData, savedOrder) {
   ].join("\n");
 }
 
+function buildWhatsappLinks(adminPhone, encodedMessage) {
+  const waMeUrl = `https://wa.me/${adminPhone}?text=${encodedMessage}`;
+  const businessIntentUrl = `intent://send?phone=${adminPhone}&text=${encodedMessage}#Intent;scheme=whatsapp;package=com.whatsapp.w4b;end`;
+  const regularIntentUrl = `intent://send?phone=${adminPhone}&text=${encodedMessage}#Intent;scheme=whatsapp;package=com.whatsapp;end`;
+
+  return {
+    waMeUrl,
+    businessIntentUrl,
+    regularIntentUrl,
+  };
+}
+
+function isAndroidDevice() {
+  return /Android/i.test(navigator.userAgent);
+}
+
+function openWhatsappWithBusinessFallback(targetWindow, links) {
+  const helpHtml = `
+    WhatsApp sedang dibuka.
+    <a href="${links.businessIntentUrl}" target="_blank" rel="noopener">Buka WhatsApp Business</a>
+    atau
+    <a href="${links.waMeUrl}" target="_blank" rel="noopener">buka WhatsApp biasa</a>.
+  `;
+
+  if (!targetWindow) {
+    proofHelp.innerHTML = helpHtml;
+    return;
+  }
+
+  targetWindow.location.href = links.waMeUrl;
+
+  if (isAndroidDevice()) {
+    window.setTimeout(() => {
+      try {
+        targetWindow.location.href = links.businessIntentUrl;
+      } catch (error) {
+        proofHelp.innerHTML = helpHtml;
+      }
+    }, 1800);
+  }
+}
+
 function getCartQuantity() {
   return [...cart.values()].reduce((total, item) => total + item.qty, 0);
 }
@@ -937,19 +979,19 @@ orderForm.addEventListener("submit", async (event) => {
     await saveOrderToSupabase(savedOrder);
 
     const message = encodeURIComponent(buildWhatsappMessage(formData, savedOrder));
-    const whatsappUrl = `https://wa.me/${adminPhone}?text=${message}`;
-    if (whatsappWindow) {
-      whatsappWindow.location.href = whatsappUrl;
-    } else {
-      proofHelp.innerHTML = `Order ${savedOrder.id} tersimpan. <a href="${whatsappUrl}" target="_blank" rel="noopener">Buka WhatsApp admin</a>.`;
-    }
+    const whatsappLinks = buildWhatsappLinks(adminPhone, message);
+    openWhatsappWithBusinessFallback(whatsappWindow, whatsappLinks);
 
     cart.clear();
     orderForm.reset();
     updateProofPreview();
     renderCart();
     if (whatsappWindow) {
-      proofHelp.textContent = `Order ${savedOrder.id} tersimpan. WhatsApp sudah dibuka untuk notifikasi admin.`;
+      proofHelp.innerHTML = `
+        Order ${savedOrder.id} tersimpan.
+        Kalau WhatsApp biasa meminta download, tap
+        <a href="${whatsappLinks.businessIntentUrl}" target="_blank" rel="noopener">Buka WhatsApp Business</a>.
+      `;
     }
   } catch (error) {
     if (whatsappWindow) {
