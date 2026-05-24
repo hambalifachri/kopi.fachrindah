@@ -699,11 +699,13 @@ function buildWhatsappMessage(formData, savedOrder) {
 
 function buildWhatsappLinks(adminPhone, encodedMessage) {
   const waMeUrl = `https://wa.me/${adminPhone}?text=${encodedMessage}`;
+  const appUrl = `whatsapp://send?phone=${adminPhone}&text=${encodedMessage}`;
   const businessIntentUrl = `intent://send?phone=${adminPhone}&text=${encodedMessage}#Intent;scheme=whatsapp;package=com.whatsapp.w4b;end`;
   const regularIntentUrl = `intent://send?phone=${adminPhone}&text=${encodedMessage}#Intent;scheme=whatsapp;package=com.whatsapp;end`;
 
   return {
     waMeUrl,
+    appUrl,
     businessIntentUrl,
     regularIntentUrl,
   };
@@ -718,17 +720,36 @@ function openWhatsappWithBusinessFallback(targetWindow, links) {
     Order tersimpan. Jika WhatsApp tidak otomatis terbuka, pilih:
     <a href="${links.businessIntentUrl}" target="_blank" rel="noopener">Buka WhatsApp Business</a>
     atau
-    <a href="${links.waMeUrl}" target="_blank" rel="noopener">buka WhatsApp biasa</a>.
+    <a href="${links.waMeUrl}" target="_blank" rel="noopener">buka WhatsApp Web</a>.
   `;
 
-  const primaryUrl = isAndroidDevice() ? links.businessIntentUrl : links.waMeUrl;
+  const primaryUrl = links.appUrl;
 
   if (!targetWindow) {
     proofHelp.innerHTML = helpHtml;
+    window.location.href = primaryUrl;
+
+    if (isAndroidDevice()) {
+      window.setTimeout(() => {
+        window.location.href = links.businessIntentUrl;
+      }, 1400);
+    }
+
     return;
   }
 
   targetWindow.location.href = primaryUrl;
+
+  if (isAndroidDevice()) {
+    window.setTimeout(() => {
+      try {
+        targetWindow.location.href = links.businessIntentUrl;
+      } catch (error) {
+        proofHelp.innerHTML = helpHtml;
+      }
+    }, 1400);
+  }
+
   proofHelp.innerHTML = helpHtml;
 }
 
@@ -985,7 +1006,7 @@ orderForm.addEventListener("submit", async (event) => {
         Jika WhatsApp Business tidak otomatis terbuka, tap
         <a href="${whatsappLinks.businessIntentUrl}" target="_blank" rel="noopener">Buka WhatsApp Business</a>
         atau
-        <a href="${whatsappLinks.waMeUrl}" target="_blank" rel="noopener">buka WhatsApp biasa</a>.
+        <a href="${whatsappLinks.waMeUrl}" target="_blank" rel="noopener">buka WhatsApp Web</a>.
       `;
     }
   } catch (error) {
