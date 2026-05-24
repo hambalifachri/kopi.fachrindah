@@ -980,39 +980,41 @@ orderForm.addEventListener("submit", async (event) => {
   const formData = new FormData(orderForm);
   const adminPhone = String(formData.get("adminPhone")).replace(/\D/g, "");
   const submitButton = orderForm.querySelector('button[type="submit"]');
-  const whatsappWindow = window.open("", "_blank");
-  if (whatsappWindow) {
-    whatsappWindow.opener = null;
-  }
 
   submitButton.disabled = true;
   submitButton.textContent = "Menyimpan order...";
 
   try {
+    // 1. Simpan data ke database Supabase terlebih dahulu
     const savedOrder = await createOrderRecord(formData);
     await saveOrderToSupabase(savedOrder);
 
+    // 2. Buat teks format pesan WhatsApp
     const message = encodeURIComponent(buildWhatsappMessage(formData, savedOrder));
     const whatsappLinks = buildWhatsappLinks(adminPhone, message);
-    openWhatsappWithBusinessFallback(whatsappWindow, whatsappLinks);
 
+    // 3. Bersihkan form & keranjang belanja
     cart.clear();
     orderForm.reset();
     updateProofPreview();
     renderCart();
-    if (whatsappWindow) {
-      proofHelp.innerHTML = `
-        Order ${savedOrder.id} tersimpan.
-        Jika WhatsApp Business tidak otomatis terbuka, tap
-        <a href="${whatsappLinks.businessIntentUrl}" target="_blank" rel="noopener">Buka WhatsApp Business</a>
-        atau
-        <a href="${whatsappLinks.waMeUrl}" target="_blank" rel="noopener">buka WhatsApp Web</a>.
-      `;
+    closeOrderModal(); // Menutup modal agar kembali bersih
+
+    // 4. LANGSUNG DIALIKKAN KE WHATSAPP (Prioritas utama langsung lempar ke App)
+    if (isAndroidDevice()) {
+      // Untuk Android, langsung tembak pakai intent link scheme agar app WhatsApp/WA Bisnis langsung merespon
+      window.location.href = whatsappLinks.appUrl;
+      
+      // Fallback jika skema default gagal dalam 500ms, lempar ke link wa.me
+      window.setTimeout(() => {
+        window.location.href = whatsappLinks.waMeUrl;
+      }, 500);
+    } else {
+      // Untuk iOS / Desktop, langsung arahkan window saat ini atau buka link wa.me
+      window.location.href = whatsappLinks.waMeUrl;
     }
+
   } catch (error) {
-    if (whatsappWindow) {
-      whatsappWindow.close();
-    }
     alert("Order belum tersimpan. Cek koneksi, konfigurasi Supabase, bucket Storage, dan policy RLS.");
   } finally {
     submitButton.disabled = false;
