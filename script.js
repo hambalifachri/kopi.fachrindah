@@ -715,28 +715,21 @@ function isAndroidDevice() {
 
 function openWhatsappWithBusinessFallback(targetWindow, links) {
   const helpHtml = `
-    WhatsApp sedang dibuka.
+    Order tersimpan. Jika WhatsApp tidak otomatis terbuka, pilih:
     <a href="${links.businessIntentUrl}" target="_blank" rel="noopener">Buka WhatsApp Business</a>
     atau
     <a href="${links.waMeUrl}" target="_blank" rel="noopener">buka WhatsApp biasa</a>.
   `;
+
+  const primaryUrl = isAndroidDevice() ? links.businessIntentUrl : links.waMeUrl;
 
   if (!targetWindow) {
     proofHelp.innerHTML = helpHtml;
     return;
   }
 
-  targetWindow.location.href = links.waMeUrl;
-
-  if (isAndroidDevice()) {
-    window.setTimeout(() => {
-      try {
-        targetWindow.location.href = links.businessIntentUrl;
-      } catch (error) {
-        proofHelp.innerHTML = helpHtml;
-      }
-    }, 1800);
-  }
+  targetWindow.location.href = primaryUrl;
+  proofHelp.innerHTML = helpHtml;
 }
 
 function getCartQuantity() {
@@ -989,8 +982,10 @@ orderForm.addEventListener("submit", async (event) => {
     if (whatsappWindow) {
       proofHelp.innerHTML = `
         Order ${savedOrder.id} tersimpan.
-        Kalau WhatsApp biasa meminta download, tap
-        <a href="${whatsappLinks.businessIntentUrl}" target="_blank" rel="noopener">Buka WhatsApp Business</a>.
+        Jika WhatsApp Business tidak otomatis terbuka, tap
+        <a href="${whatsappLinks.businessIntentUrl}" target="_blank" rel="noopener">Buka WhatsApp Business</a>
+        atau
+        <a href="${whatsappLinks.waMeUrl}" target="_blank" rel="noopener">buka WhatsApp biasa</a>.
       `;
     }
   } catch (error) {
