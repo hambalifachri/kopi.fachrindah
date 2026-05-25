@@ -197,7 +197,7 @@ const cart = new Map();
 let pendingItemId = "";
 let proofPreviewUrl = "";
 let supabaseClient = null;
-let countdownInterval = null; // Penampung hitung mundur
+let countdownInterval = null; 
 const selectedOptions = {
   temperature: "Ice",
   size: "Regular",
@@ -246,7 +246,6 @@ const optionGroups = document.querySelectorAll("[data-option-group]");
 const selectedDrink = document.querySelector("#selectedDrink");
 const addConfiguredItemButton = document.querySelector("#addConfiguredItem");
 
-// Fungsi hitung mundur 15 menit
 function startCountdown(durationInSeconds, displayEl) {
   if (countdownInterval) clearInterval(countdownInterval);
   let timer = durationInSeconds, minutes, seconds;
@@ -266,18 +265,6 @@ function startCountdown(durationInSeconds, displayEl) {
       closeOrderModal();
     }
   }, 1000);
-}
-
-// Perhitungan rumus Haversine untuk sorting jarak outlet GPS
-function calculateHaversine(lat1, lon1, lat2, lon2) {
-  const R = 6371; 
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a = 
-    Math.sin(dLat/2) * Math.sin(dLat/2) +
-    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
 }
 
 function menuVisual(item) {
@@ -423,15 +410,6 @@ function renderCheckoutSummary(entries, subtotal) {
 
 function formatOptions(options) {
   return [options.temperature, options.size, options.sugar, options.ice].filter(Boolean).join(" / ");
-}
-
-function escapeHtml(value) {
-  return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
 }
 
 function getSupabaseConfig() {
@@ -590,7 +568,7 @@ function openOrderModal() {
 }
 
 function closeOrderModal() {
-  if (countdownInterval) clearInterval(countdownInterval); // Hentikan timer jika ditutup
+  if (countdownInterval) clearInterval(countdownInterval); 
   orderModal.classList.remove("open");
   orderModal.setAttribute("aria-hidden", "true");
   document.body.classList.remove("modal-open");
@@ -625,7 +603,6 @@ function showCheckoutStage() {
   renderCart();
   setModalStage("checkout");
   
-  // Menjalankan hitung mundur otomatis 15 menit (900 detik)
   const countdownEl = document.querySelector("#paymentCountdown");
   if (countdownEl) startCountdown(900, countdownEl);
 }
@@ -719,15 +696,7 @@ function buildWhatsappMessage(formData, savedOrder) {
 function buildWhatsappLinks(adminPhone, encodedMessage) {
   const waMeUrl = `https://wa.me/${adminPhone}?text=${encodedMessage}`;
   const appUrl = `whatsapp://send?phone=${adminPhone}&text=${encodedMessage}`;
-  const businessIntentUrl = `intent://send?phone=${adminPhone}&text=${encodedMessage}#Intent;scheme=whatsapp;package=com.whatsapp.w4b;end`;
-  const regularIntentUrl = `intent://send?phone=${adminPhone}&text=${encodedMessage}#Intent;scheme=whatsapp;package=com.whatsapp;end`;
-
-  return {
-    waMeUrl,
-    appUrl,
-    businessIntentUrl,
-    regularIntentUrl,
-  };
+  return { waMeUrl, appUrl };
 }
 
 function isAndroidDevice() {
@@ -816,128 +785,73 @@ function renderSavedReview(review) {
   reviewsGrid.prepend(article);
 }
 
-// Tambahan Event GPS Pencarian 4 Outlet Terdekat Indonesia
-// GANTI BLOK LOGIKA TOMBOL GPS DI SCRIPT.JS KAMU DENGAN INI:
-document.addEventListener("DOMContentLoaded", () => {
-  const btnGPS = document.querySelector("#btnGPS");
-  const txtAddress = document.querySelector("#modalCustomerAddress");
-  const gpsStatus = document.querySelector("#gpsStatus");
-  const optionsContainer = document.querySelector("#outletOptionsContainer");
-
-  if (!btnGPS) return;
-
-  btnGPS.addEventListener("click", () => {
-    if (!navigator.geolocation) {
-      gpsStatus.textContent = "Browser kamu tidak mendukung GPS.";
-      return;
-    }
-
-    btnGPS.disabled = true;
-    btnGPS.textContent = "⏳ Mencari...";
-    gpsStatus.textContent = "Mencari koordinat lokasi kamu...";
-    optionsContainer.innerHTML = ""; 
-
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const userLat = position.coords.latitude;
-        const userLng = position.coords.longitude;
-        gpsStatus.textContent = "Mencari outlet di sekitar kamu...";
-
-        try {
-          // MENGGUNAKAN NOMINATIM API: Lebih stabil, ringan, dan cepat di Indonesia
-          // Mencari entitas bernama "Kopi Kenangan" di sekitar koordinat user
-          const nominatimUrl = `https://nominatim.openstreetmap.org/search?q=Kopi+Kenangan&format=json&lat=${userLat}&lon=${userLng}&bounded=0&addressdetails=1&limit=10`;
-
-          const response = await fetch(nominatimUrl, {
-            headers: {
-              "Accept-Language": "id",
-              "User-Agent": "KopiFachrindahWebApp/1.0" // Mengikuti aturan tata krama penggunaan API OpenStreetMap
-            }
-          });
-          const elements = await response.json();
-
-          if (elements && elements.length > 0) {
-            // 1. Hitung jarak untuk setiap outlet yang didapat
-            const mappedOutlets = elements.map(element => {
-  const distance = calculateHaversine(userLat, userLng, parseFloat(element.lat), parseFloat(element.lon));
-  
-  // LOGIKA BARU: Mengambil nama tempat DAN detail lokasi setelah koma (misal: jalan/mall/kecamatan)
-  const nameParts = element.display_name.split(",");
-  let cleanName = nameParts[0]; // Ini "Kopi Kenangan"
-  
-  // Ambil bagian kedua (bisa berupa nama jalan, mall, atau gedung) jika ada
-  if (nameParts.length > 1) {
-    const detailLocation = nameParts[1].trim();
-    // Gabungkan menjadi: "Kopi Kenangan - [Nama Detail]"
-    cleanName = `${cleanName} - ${detailLocation}`;
-  }
-
-  return {
-    name: cleanName,
-    distance: distance
-  };
-});
-
-            // 2. Urutkan berdasarkan yang paling dekat
-            mappedOutlets.sort((a, b) => a.distance - b.distance);
-            
-            // 3. Ambil maksimal 4 outlet teratas
-            const topFour = mappedOutlets.slice(0, 4);
-            gpsStatus.textContent = "Silakan klik salah satu outlet terdekat:";
-            
-            // 4. Tampilkan tombol pilihan
-            optionsContainer.innerHTML = topFour.map((outlet, index) => {
-              return `
-                <button type="button" class="outlet-option-btn" data-name="${outlet.name}" 
-                  style="text-align: left; padding: 10px 14px; border: 2px solid var(--line); border-radius: 8px; background: #fffdf9; color: var(--brown); font-size: 0.82rem; font-weight: 800; cursor: pointer; transition: all 0.2s; width: 100%;">
-                  ${index + 1}. ${outlet.name} <span style="color: var(--muted); font-weight: 600; font-size: 0.75rem;">(± ${outlet.distance.toFixed(2)} km)</span>
-                </button>
-              `;
-            }).join("");
-
-            // 5. Logika klik pada tombol pilihan
-            document.querySelectorAll(".outlet-option-btn").forEach(button => {
-              button.addEventListener("click", () => {
-                const selectedName = button.getAttribute("data-name");
-                txtAddress.value = selectedName;
-                
-                document.querySelectorAll(".outlet-option-btn").forEach(btn => {
-                  btn.style.borderColor = "var(--line)";
-                  btn.style.background = "#fffdf9";
-                });
-                button.style.borderColor = "var(--orange)";
-                button.style.background = "#fff8f1";
-                gpsStatus.textContent = `Terpilih: ${selectedName}`;
-              });
-            });
-
-          } else {
-            gpsStatus.textContent = "Tidak ditemukan Kopi Kenangan di sekitar lokasi kamu. Silakan isi manual.";
-          }
-        } catch (error) {
-          console.error(error);
-          gpsStatus.textContent = "Koneksi peta sibuk. Silakan ketik lokasi manual ya.";
-        } finally {
-          btnGPS.disabled = false;
-          btnGPS.textContent = "📍 Cari Terdekat";
-        }
-      },
-      () => {
-        btnGPS.disabled = false;
-        btnGPS.textContent = "📍 Cari Terdekat";
-        gpsStatus.textContent = "Akses GPS ditolak atau gagal mendeteksi lokasi kamu.";
-      },
-      { enableHighAccuracy: true, timeout: 8000 }
-    );
-  });
-});
-
+// =========================================================
+// EVENT LISTENER GLOBAL (SENTRALISASI SEMUA FITUR KLIK WEB)
+// =========================================================
 document.addEventListener("click", (event) => {
   const closeTarget = event.target.closest("[data-close-modal]");
   if (closeTarget) {
     closeOrderModal();
     return;
   }
+
+  // === FITUR MAPS TERBARU (DIJAMIN MERESPON DAN ANTI-MOGOK) ===
+  const btnGPS = event.target.closest("#btnGPS");
+  if (btnGPS) {
+    const txtAddress = document.querySelector("#modalCustomerAddress");
+    const searchCityInput = document.querySelector("#searchCityInput");
+    const gpsStatus = document.querySelector("#gpsStatus");
+    const queryCity = searchCityInput.value.trim();
+    
+    // KONDISI 1: JIKA USER MENGETIKKAN NAMA JALAN/MALL/DAERAH
+    if (queryCity.length > 0) {
+      gpsStatus.textContent = "Membuka Google Maps di sekitar " + queryCity + "...";
+      
+      const mapsUrl = "https://www.google.com/maps/search/Kopi+Kenangan+" + encodeURIComponent(queryCity);
+      window.open(mapsUrl, "_blank");
+      
+      txtAddress.placeholder = "Tulis nama outlet yang kamu lihat paling dekat di Google Maps tadi...";
+      txtAddress.focus();
+      gpsStatus.textContent = "Silakan lihat outlet terdekat di tab Google Maps, lalu isi namanya di kolom bawah.";
+    } 
+    // KONDISI 2: JIKA KOLOM CARI KOSONG, GUNAKAN GPS HP/LAPTOP ASLI
+    else {
+      if (!navigator.geolocation) {
+        gpsStatus.textContent = "Browser tidak mendukung GPS. Silakan langsung ketik nama daerah kamu di kolom pencarian.";
+        return;
+      }
+      
+      btnGPS.disabled = true;
+      btnGPS.textContent = "⏳ Membuka...";
+      gpsStatus.textContent = "Meminta izin koordinat GPS kamu...";
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          gpsStatus.textContent = "Lokasi ditemukan! Membuka Google Maps...";
+          
+          const mapsUrl = "https://www.google.com/maps/search/Kopi+Kenangan/@" + lat + "," + lng + ",15z";
+          window.open(mapsUrl, "_blank");
+
+          txtAddress.placeholder = "Tulis nama outlet terdekat hasil dari Google Maps...";
+          txtAddress.focus();
+          
+          btnGPS.disabled = false;
+          btnGPS.textContent = "📍 Cari di Maps";
+          gpsStatus.textContent = "Silakan cek Kopi Kenangan terdekat di aplikasi Google Maps kamu, lalu isi namanya di bawah.";
+        },
+        () => {
+          btnGPS.disabled = false;
+          btnGPS.textContent = "📍 Cari di Maps";
+          gpsStatus.textContent = "Akses GPS ditolak/lemah. Silakan langsung ketik nama daerah kamu di kolom pencarian atas.";
+        },
+        { enableHighAccuracy: true, timeout: 6000 }
+      );
+    }
+    return; 
+  }
+  // =========================================================
 
   const addButton = event.target.closest(".add-button[data-id]");
   if (addButton) {

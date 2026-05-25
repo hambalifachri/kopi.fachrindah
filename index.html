@@ -311,14 +311,16 @@
               </div>
               
               <label for="modalCustomerAddress">Lokasi outlet</label>
-              <div class="gps-row" style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: start;">
-                <textarea id="modalCustomerAddress" name="customerAddress" rows="2" placeholder="Pilih dari daftar outlet terdekat di bawah..." required></textarea>
-                <button id="btnGPS" type="button" style="min-height: 44px; padding: 0 14px; border: 0; border-radius: 10px; color: var(--white); background: #22a65a; font-weight: 900; font-size: 0.8rem;">
-                  📍 Cari Terdekat
-                </button>
+              <div class="gps-search-block" style="display: grid; gap: 8px; margin-bottom: 8px; width: 100%;">
+                <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; width: 100%;">
+                  <input id="searchCityInput" type="text" placeholder="Ketik nama jalan/mall/daerah kamu..." style="min-height: 44px; margin: 0;" />
+                  <button id="btnGPS" type="button" style="min-height: 44px; padding: 0 14px; border: 0; border-radius: 10px; color: var(--white); background: #22a65a; font-weight: 900; font-size: 0.8rem; white-space: nowrap;">
+                    📍 Cari di Maps
+                  </button>
+                </div>
+                <textarea id="modalCustomerAddress" name="customerAddress" rows="2" placeholder="Contoh: Kopi Kenangan Mall Kelapa Gading 3 Lantai Ground" required></textarea>
               </div>
-              <p id="gpsStatus" style="margin: 5px 0 0; color: var(--muted); font-size: 0.75rem; font-weight: 800;"></p>
-              <div id="outletOptionsContainer" style="display: grid; gap: 6px; margin-top: 4px; margin-bottom: 10px;"></div>
+              <p id="gpsStatus" style="margin: 0; color: var(--muted); font-size: 0.75rem; font-weight: 800; line-height: 1.4;"></p>
 
               <label>
                 Catatan
