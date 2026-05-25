@@ -10,7 +10,6 @@ const categories = [
 ];
 
 const menuItems = [
-
   { id: "og-thai-tea", group: "baru", name: "OG Thai Tea", oldPrice: 19000, price: 12000, color: "#e56d17", foam: "#fff1df", drizzle: "#d35c19", isNew: true },
   { id: "thai-tea-loaded", group: "baru", name: "Thai Tea Loaded", oldPrice: 27000, price: 16000, color: "#cf6b20", foam: "#fff4e5", drizzle: "#5b2f1b", isNew: true },
   { id: "thai-tea-aren", group: "baru", name: "Thai Tea Aren", oldPrice: 24000, price: 14500, color: "#bd5b1d", foam: "#f4d09c", drizzle: "#7c3f1f", isNew: true },
@@ -198,6 +197,7 @@ const cart = new Map();
 let pendingItemId = "";
 let proofPreviewUrl = "";
 let supabaseClient = null;
+let countdownInterval = null; // Penampung hitung mundur
 const selectedOptions = {
   temperature: "Ice",
   size: "Regular",
@@ -246,6 +246,40 @@ const optionGroups = document.querySelectorAll("[data-option-group]");
 const selectedDrink = document.querySelector("#selectedDrink");
 const addConfiguredItemButton = document.querySelector("#addConfiguredItem");
 
+// Fungsi hitung mundur 15 menit
+function startCountdown(durationInSeconds, displayEl) {
+  if (countdownInterval) clearInterval(countdownInterval);
+  let timer = durationInSeconds, minutes, seconds;
+  countdownInterval = setInterval(() => {
+    minutes = parseInt(timer / 60, 10);
+    seconds = parseInt(timer % 60, 10);
+
+    minutes = minutes < 10 ? "0" + minutes : minutes;
+    seconds = seconds < 10 ? "0" + seconds : seconds;
+
+    displayEl.textContent = minutes + ":" + seconds;
+
+    if (--timer < 0) {
+      clearInterval(countdownInterval);
+      displayEl.textContent = "WAKTU HABIS";
+      alert("Waktu transfer habis! Silakan checkout ulang.");
+      closeOrderModal();
+    }
+  }, 1000);
+}
+
+// Perhitungan rumus Haversine untuk sorting jarak outlet GPS
+function calculateHaversine(lat1, lon1, lat2, lon2) {
+  const R = 6371; 
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
 function menuVisual(item) {
   if (item.image) {
     return `
@@ -267,31 +301,13 @@ function menuVisual(item) {
   `;
 }
 
-/* function menuCard(item) {
+function menuCard(item) {
   return `
     <article class="menu-card ${item.isNew ? "new" : ""}">
       ${menuVisual(item)}
       <h3>${item.name}</h3>
+      ${item.oldPrice ? `<span class="old-price">${rupiah.format(item.oldPrice)}</span>` : ""}
       <span class="price">${rupiah.format(item.price)}</span>
-      <button class="add-button" type="button" data-id="${item.id}">Tambah</button>
-    </article>
-  `;
-} */
-
-  function menuCard(item) {
-  return `
-    <article class="menu-card ${item.isNew ? "new" : ""}">
-      ${menuVisual(item)}
-      <h3>${item.name}</h3>
-
-      ${
-        item.oldPrice
-          ? `<span class="old-price">${rupiah.format(item.oldPrice)}</span>`
-          : ""
-      }
-
-      <span class="price">${rupiah.format(item.price)}</span>
-
       <button class="add-button" type="button" data-id="${item.id}">
         Tambah
       </button>
@@ -574,6 +590,7 @@ function openOrderModal() {
 }
 
 function closeOrderModal() {
+  if (countdownInterval) clearInterval(countdownInterval); // Hentikan timer jika ditutup
   orderModal.classList.remove("open");
   orderModal.setAttribute("aria-hidden", "true");
   document.body.classList.remove("modal-open");
@@ -607,6 +624,10 @@ function setModalStage(stage) {
 function showCheckoutStage() {
   renderCart();
   setModalStage("checkout");
+  
+  // Menjalankan hitung mundur otomatis 15 menit (900 detik)
+  const countdownEl = document.querySelector("#paymentCountdown");
+  if (countdownEl) startCountdown(900, countdownEl);
 }
 
 function addItem(id) {
@@ -614,9 +635,7 @@ function addItem(id) {
   if (!item) return;
 
   const options = isFoodItem(item) ? {} : { ...selectedOptions };
-
   const cartKey = `${id}|${Object.values(options).join("|")}`;
-
   const current = cart.get(cartKey);
 
   cart.set(cartKey, {
@@ -715,44 +734,6 @@ function isAndroidDevice() {
   return /Android/i.test(navigator.userAgent);
 }
 
-function openWhatsappWithBusinessFallback(targetWindow, links) {
-  const helpHtml = `
-    Order tersimpan. Jika WhatsApp tidak otomatis terbuka, pilih:
-    <a href="${links.businessIntentUrl}" target="_blank" rel="noopener">Buka WhatsApp Business</a>
-    atau
-    <a href="${links.waMeUrl}" target="_blank" rel="noopener">buka WhatsApp Web</a>.
-  `;
-
-  const primaryUrl = links.appUrl;
-
-  if (!targetWindow) {
-    proofHelp.innerHTML = helpHtml;
-    window.location.href = primaryUrl;
-
-    if (isAndroidDevice()) {
-      window.setTimeout(() => {
-        window.location.href = links.businessIntentUrl;
-      }, 1400);
-    }
-
-    return;
-  }
-
-  targetWindow.location.href = primaryUrl;
-
-  if (isAndroidDevice()) {
-    window.setTimeout(() => {
-      try {
-        targetWindow.location.href = links.businessIntentUrl;
-      } catch (error) {
-        proofHelp.innerHTML = helpHtml;
-      }
-    }, 1400);
-  }
-
-  proofHelp.innerHTML = helpHtml;
-}
-
 function getCartQuantity() {
   return [...cart.values()].reduce((total, item) => total + item.qty, 0);
 }
@@ -803,7 +784,7 @@ async function sharePaymentProof() {
   }
 
   if (!navigator.canShare || !navigator.canShare({ files: [file] })) {
-    alert("Browser ini belum support kirim file otomatis. Setelah WhatsApp terbuka, lampirkan file bukti transfer secara manual.");
+    alert("Browser ini belum support kirim file otomatis. Silakan lampirkan manual di WhatsApp.");
     return;
   }
 
@@ -834,6 +815,122 @@ function renderSavedReview(review) {
   `;
   reviewsGrid.prepend(article);
 }
+
+// Tambahan Event GPS Pencarian 4 Outlet Terdekat Indonesia
+// GANTI BLOK LOGIKA TOMBOL GPS DI SCRIPT.JS KAMU DENGAN INI:
+document.addEventListener("DOMContentLoaded", () => {
+  const btnGPS = document.querySelector("#btnGPS");
+  const txtAddress = document.querySelector("#modalCustomerAddress");
+  const gpsStatus = document.querySelector("#gpsStatus");
+  const optionsContainer = document.querySelector("#outletOptionsContainer");
+
+  if (!btnGPS) return;
+
+  btnGPS.addEventListener("click", () => {
+    if (!navigator.geolocation) {
+      gpsStatus.textContent = "Browser kamu tidak mendukung GPS.";
+      return;
+    }
+
+    btnGPS.disabled = true;
+    btnGPS.textContent = "⏳ Mencari...";
+    gpsStatus.textContent = "Mencari koordinat lokasi kamu...";
+    optionsContainer.innerHTML = ""; 
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const userLat = position.coords.latitude;
+        const userLng = position.coords.longitude;
+        gpsStatus.textContent = "Mencari outlet di sekitar kamu...";
+
+        try {
+          // MENGGUNAKAN NOMINATIM API: Lebih stabil, ringan, dan cepat di Indonesia
+          // Mencari entitas bernama "Kopi Kenangan" di sekitar koordinat user
+          const nominatimUrl = `https://nominatim.openstreetmap.org/search?q=Kopi+Kenangan&format=json&lat=${userLat}&lon=${userLng}&bounded=0&addressdetails=1&limit=10`;
+
+          const response = await fetch(nominatimUrl, {
+            headers: {
+              "Accept-Language": "id",
+              "User-Agent": "KopiFachrindahWebApp/1.0" // Mengikuti aturan tata krama penggunaan API OpenStreetMap
+            }
+          });
+          const elements = await response.json();
+
+          if (elements && elements.length > 0) {
+            // 1. Hitung jarak untuk setiap outlet yang didapat
+            const mappedOutlets = elements.map(element => {
+  const distance = calculateHaversine(userLat, userLng, parseFloat(element.lat), parseFloat(element.lon));
+  
+  // LOGIKA BARU: Mengambil nama tempat DAN detail lokasi setelah koma (misal: jalan/mall/kecamatan)
+  const nameParts = element.display_name.split(",");
+  let cleanName = nameParts[0]; // Ini "Kopi Kenangan"
+  
+  // Ambil bagian kedua (bisa berupa nama jalan, mall, atau gedung) jika ada
+  if (nameParts.length > 1) {
+    const detailLocation = nameParts[1].trim();
+    // Gabungkan menjadi: "Kopi Kenangan - [Nama Detail]"
+    cleanName = `${cleanName} - ${detailLocation}`;
+  }
+
+  return {
+    name: cleanName,
+    distance: distance
+  };
+});
+
+            // 2. Urutkan berdasarkan yang paling dekat
+            mappedOutlets.sort((a, b) => a.distance - b.distance);
+            
+            // 3. Ambil maksimal 4 outlet teratas
+            const topFour = mappedOutlets.slice(0, 4);
+            gpsStatus.textContent = "Silakan klik salah satu outlet terdekat:";
+            
+            // 4. Tampilkan tombol pilihan
+            optionsContainer.innerHTML = topFour.map((outlet, index) => {
+              return `
+                <button type="button" class="outlet-option-btn" data-name="${outlet.name}" 
+                  style="text-align: left; padding: 10px 14px; border: 2px solid var(--line); border-radius: 8px; background: #fffdf9; color: var(--brown); font-size: 0.82rem; font-weight: 800; cursor: pointer; transition: all 0.2s; width: 100%;">
+                  ${index + 1}. ${outlet.name} <span style="color: var(--muted); font-weight: 600; font-size: 0.75rem;">(± ${outlet.distance.toFixed(2)} km)</span>
+                </button>
+              `;
+            }).join("");
+
+            // 5. Logika klik pada tombol pilihan
+            document.querySelectorAll(".outlet-option-btn").forEach(button => {
+              button.addEventListener("click", () => {
+                const selectedName = button.getAttribute("data-name");
+                txtAddress.value = selectedName;
+                
+                document.querySelectorAll(".outlet-option-btn").forEach(btn => {
+                  btn.style.borderColor = "var(--line)";
+                  btn.style.background = "#fffdf9";
+                });
+                button.style.borderColor = "var(--orange)";
+                button.style.background = "#fff8f1";
+                gpsStatus.textContent = `Terpilih: ${selectedName}`;
+              });
+            });
+
+          } else {
+            gpsStatus.textContent = "Tidak ditemukan Kopi Kenangan di sekitar lokasi kamu. Silakan isi manual.";
+          }
+        } catch (error) {
+          console.error(error);
+          gpsStatus.textContent = "Koneksi peta sibuk. Silakan ketik lokasi manual ya.";
+        } finally {
+          btnGPS.disabled = false;
+          btnGPS.textContent = "📍 Cari Terdekat";
+        }
+      },
+      () => {
+        btnGPS.disabled = false;
+        btnGPS.textContent = "📍 Cari Terdekat";
+        gpsStatus.textContent = "Akses GPS ditolak atau gagal mendeteksi lokasi kamu.";
+      },
+      { enableHighAccuracy: true, timeout: 8000 }
+    );
+  });
+});
 
 document.addEventListener("click", (event) => {
   const closeTarget = event.target.closest("[data-close-modal]");
@@ -980,10 +1077,6 @@ orderForm.addEventListener("submit", async (event) => {
   const formData = new FormData(orderForm);
   const adminPhone = String(formData.get("adminPhone")).replace(/\D/g, "");
   const submitButton = orderForm.querySelector('button[type="submit"]');
-  const whatsappWindow = window.open("", "_blank");
-  if (whatsappWindow) {
-    whatsappWindow.opener = null;
-  }
 
   submitButton.disabled = true;
   submitButton.textContent = "Menyimpan order...";
@@ -994,25 +1087,23 @@ orderForm.addEventListener("submit", async (event) => {
 
     const message = encodeURIComponent(buildWhatsappMessage(formData, savedOrder));
     const whatsappLinks = buildWhatsappLinks(adminPhone, message);
-    openWhatsappWithBusinessFallback(whatsappWindow, whatsappLinks);
 
     cart.clear();
     orderForm.reset();
     updateProofPreview();
     renderCart();
-    if (whatsappWindow) {
-      proofHelp.innerHTML = `
-        Order ${savedOrder.id} tersimpan.
-        Jika WhatsApp Business tidak otomatis terbuka, tap
-        <a href="${whatsappLinks.businessIntentUrl}" target="_blank" rel="noopener">Buka WhatsApp Business</a>
-        atau
-        <a href="${whatsappLinks.waMeUrl}" target="_blank" rel="noopener">buka WhatsApp Web</a>.
-      `;
+    closeOrderModal(); 
+
+    if (isAndroidDevice()) {
+      window.location.href = whatsappLinks.appUrl;
+      window.setTimeout(() => {
+        window.location.href = whatsappLinks.waMeUrl;
+      }, 500);
+    } else {
+      window.location.href = whatsappLinks.waMeUrl;
     }
+
   } catch (error) {
-    if (whatsappWindow) {
-      whatsappWindow.close();
-    }
     alert("Order belum tersimpan. Cek koneksi, konfigurasi Supabase, bucket Storage, dan policy RLS.");
   } finally {
     submitButton.disabled = false;

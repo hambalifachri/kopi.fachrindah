@@ -288,6 +288,11 @@
                 <p>Pembayaran QRIS</p>
               </div>
               <img src="assets/qris-kopi-fachrindah.jpeg" alt="QRIS kopi.fachrindah" />
+              
+              <div id="timerContainer" style="text-align: center; color: var(--red); font-weight: 800; margin: 10px 0; font-size: 0.9rem;">
+                Selesaikan transfer dalam: <span id="paymentCountdown">15:00</span>
+              </div>
+
               <p>Scan QRIS sesuai total bayar, lalu upload bukti. Order akan tersimpan untuk admin.</p>
             </div>
             <form class="order-form modal-order-form" id="modalOrderForm">
@@ -304,10 +309,17 @@
                   <input id="modalCustomerPhone" name="customerPhone" type="tel" placeholder="08xxxxxxxxxx" required />
                 </label>
               </div>
-              <label>
-                Lokasi outlet
-                <textarea id="modalCustomerAddress" name="customerAddress" rows="3" placeholder="Contoh: Kopi Kenangan Grand Indonesia" required></textarea>
-              </label>
+              
+              <label for="modalCustomerAddress">Lokasi outlet</label>
+              <div class="gps-row" style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: start;">
+                <textarea id="modalCustomerAddress" name="customerAddress" rows="2" placeholder="Pilih dari daftar outlet terdekat di bawah..." required></textarea>
+                <button id="btnGPS" type="button" style="min-height: 44px; padding: 0 14px; border: 0; border-radius: 10px; color: var(--white); background: #22a65a; font-weight: 900; font-size: 0.8rem;">
+                  📍 Cari Terdekat
+                </button>
+              </div>
+              <p id="gpsStatus" style="margin: 5px 0 0; color: var(--muted); font-size: 0.75rem; font-weight: 800;"></p>
+              <div id="outletOptionsContainer" style="display: grid; gap: 6px; margin-top: 4px; margin-bottom: 10px;"></div>
+
               <label>
                 Catatan
                 <textarea id="modalOrderNote" name="orderNote" rows="2" placeholder="Less ice, gula normal, jam kirim, dll"></textarea>
