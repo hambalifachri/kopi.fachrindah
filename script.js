@@ -197,7 +197,6 @@ const cart = new Map();
 let pendingItemId = "";
 let proofPreviewUrl = "";
 let supabaseClient = null;
-let countdownInterval = null; 
 const selectedOptions = {
   temperature: "Ice",
   size: "Regular",
@@ -245,27 +244,6 @@ const shareProofButton = document.querySelector("#shareProofButton");
 const optionGroups = document.querySelectorAll("[data-option-group]");
 const selectedDrink = document.querySelector("#selectedDrink");
 const addConfiguredItemButton = document.querySelector("#addConfiguredItem");
-
-function startCountdown(durationInSeconds, displayEl) {
-  if (countdownInterval) clearInterval(countdownInterval);
-  let timer = durationInSeconds, minutes, seconds;
-  countdownInterval = setInterval(() => {
-    minutes = parseInt(timer / 60, 10);
-    seconds = parseInt(timer % 60, 10);
-
-    minutes = minutes < 10 ? "0" + minutes : minutes;
-    seconds = seconds < 10 ? "0" + seconds : seconds;
-
-    displayEl.textContent = minutes + ":" + seconds;
-
-    if (--timer < 0) {
-      clearInterval(countdownInterval);
-      displayEl.textContent = "WAKTU HABIS";
-      alert("Waktu transfer habis! Silakan checkout ulang.");
-      closeOrderModal();
-    }
-  }, 1000);
-}
 
 function menuVisual(item) {
   if (item.image) {
@@ -568,7 +546,6 @@ function openOrderModal() {
 }
 
 function closeOrderModal() {
-  if (countdownInterval) clearInterval(countdownInterval); 
   orderModal.classList.remove("open");
   orderModal.setAttribute("aria-hidden", "true");
   document.body.classList.remove("modal-open");
@@ -602,9 +579,6 @@ function setModalStage(stage) {
 function showCheckoutStage() {
   renderCart();
   setModalStage("checkout");
-  
-  const countdownEl = document.querySelector("#paymentCountdown");
-  if (countdownEl) startCountdown(900, countdownEl);
 }
 
 function addItem(id) {
@@ -803,18 +777,16 @@ document.addEventListener("click", (event) => {
     const gpsStatus = document.querySelector("#gpsStatus");
     const queryCity = searchCityInput.value.trim();
     
-    // KONDISI 1: JIKA USER MENGETIKKAN NAMA JALAN/MALL/DAERAH
     if (queryCity.length > 0) {
       gpsStatus.textContent = "Membuka Google Maps di sekitar " + queryCity + "...";
       
-      const mapsUrl = "https://www.google.com/maps/search/Kopi+Kenangan+" + encodeURIComponent(queryCity);
+      const mapsUrl = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(queryCity + " Kopi Kenangan");
       window.open(mapsUrl, "_blank");
       
       txtAddress.placeholder = "Tulis nama outlet yang kamu lihat paling dekat di Google Maps tadi...";
       txtAddress.focus();
       gpsStatus.textContent = "Silakan lihat outlet terdekat di tab Google Maps, lalu isi namanya di kolom bawah.";
     } 
-    // KONDISI 2: JIKA KOLOM CARI KOSONG, GUNAKAN GPS HP/LAPTOP ASLI
     else {
       if (!navigator.geolocation) {
         gpsStatus.textContent = "Browser tidak mendukung GPS. Silakan langsung ketik nama daerah kamu di kolom pencarian.";
@@ -831,7 +803,7 @@ document.addEventListener("click", (event) => {
           const lng = position.coords.longitude;
           gpsStatus.textContent = "Lokasi ditemukan! Membuka Google Maps...";
           
-          const mapsUrl = "https://www.google.com/maps/search/Kopi+Kenangan/@" + lat + "," + lng + ",15z";
+          const mapsUrl = "https://www.google.com/maps/search/?api=1&query=Kopi+Kenangan&center=" + lat + "," + lng + "&zoom=15";
           window.open(mapsUrl, "_blank");
 
           txtAddress.placeholder = "Tulis nama outlet terdekat hasil dari Google Maps...";
