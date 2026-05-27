@@ -1689,3 +1689,7 @@ textarea:focus {
     border-left: 0;
   }
 }
+
+.option-grid.one {
+  grid-template-columns: 1fr;
+}

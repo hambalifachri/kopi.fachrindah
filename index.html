@@ -148,9 +148,7 @@
               <p>Pembayaran QRIS</p>
             </div>
             <img src="assets/qris-kopi-fachrindah.jpeg" alt="QRIS kopi.fachrindah" />
-            <p>
-              Scan QRIS sesuai total bayar, lalu upload bukti pembayaran saat checkout.
-            </p>
+            <p>Scan QRIS sesuai total bayar, lalu upload bukti pembayaran saat checkout.</p>
           </div>
         </div>
 
@@ -195,11 +193,9 @@
 
           <div class="modal-stage" id="modalCustomize">
             <div class="selected-drink modal-product" id="selectedDrink">
-              <span>Belum pilih menu</span>
-              <strong>Klik tombol Tambah di price list dulu</strong>
-            </div>
+              </div>
             <div class="modal-options" id="modalOptions">
-              <div class="option-group" data-option-group="temperature">
+              <div class="option-group" data-option-group="temperature" id="groupTemperature">
                 <div class="option-heading">
                   <strong>Temperature</strong>
                   <span>Select 1</span>
@@ -215,27 +211,54 @@
                   </button>
                 </div>
               </div>
-              <div class="option-group" data-option-group="size">
+              
+              <div class="option-group" data-option-group="size" id="groupSize">
                 <div class="option-heading">
                   <strong>Size</strong>
                   <span>Select 1</span>
                 </div>
                 <div class="option-grid three">
-                  <button class="option-card selected" type="button" data-option-value="Regular">Regular</button>
+                  <button class="option-card selected" type="button" data-option-value="Regular" id="optRegularBtn">Regular</button>
+                  <button class="option-card" type="button" data-option-value="Large" id="optLargeBtn">Large</button>
+                  <button class="option-card" type="button" data-option-value="Jumbo" id="optJumboBtn">Jumbo</button>
                 </div>
               </div>
-              <div class="option-group" data-option-group="sugar">
+
+              <div class="option-group" data-option-group="beans" id="groupBeans">
+                <div class="option-heading">
+                  <strong>Biji Kopi (Beans)</strong>
+                  <span>Select 1</span>
+                </div>
+                <div class="option-grid two">
+                  <button class="option-card selected" type="button" data-option-value="Kenangan Blend">Kenangan Blend</button>
+                  <button class="option-card" type="button" data-option-value="Juwara Beans" id="optJuwaraBtn">Juwara Beans (+Rp3k)</button>
+                </div>
+              </div>
+
+              <div class="option-group" data-option-group="milk" id="groupMilk">
+                <div class="option-heading">
+                  <strong>Pilihan Susu (Milk)</strong>
+                  <span>Select 1</span>
+                </div>
+                <div class="option-grid two">
+                  <button class="option-card selected" type="button" data-option-value="Milk">Fresh Milk</button>
+                  <button class="option-card" type="button" data-option-value="Oatside" id="optOatsideBtn">Oatside (+Rp3k)</button>
+                </div>
+              </div>
+
+              <div class="option-group" data-option-group="sugar" id="groupSugar">
                 <div class="option-heading">
                   <strong>Sugar Level</strong>
                   <span>Select 1</span>
                 </div>
-                <div class="option-grid three">
+                <div class="option-grid three" id="sugarGrid">
                   <button class="option-card selected" type="button" data-option-value="Normal Sugar">Normal Sugar</button>
                   <button class="option-card" type="button" data-option-value="Less Sugar">Less Sugar</button>
-                  <button class="option-card" type="button" data-option-value="No Sugar">No Sugar</button>
+                  <button class="option-card" type="button" data-option-value="No Sugar" id="optNoSugarBtn">No Sugar</button>
                 </div>
               </div>
-              <div class="option-group" data-option-group="ice">
+
+              <div class="option-group" data-option-group="ice" id="groupIce">
                 <div class="option-heading">
                   <strong>Ice Level</strong>
                   <span>Select 1</span>
@@ -268,7 +291,7 @@
                 <strong id="modalGrandTotal">Rp0</strong>
               </div>
             </div>
-            <div class="modal-next-actions" id="modalNextActions">
+            <div class="modal-next-actions">
               <p>Pesanan sudah masuk keranjang. Mau tambah pesanan lagi atau selesai?</p>
               <div class="modal-choice-row">
                 <button class="secondary-button" id="continueShopping" type="button">Tambah Pesanan Lagi</button>
@@ -365,7 +388,9 @@
                 Review
                 <textarea id="modalReviewText" name="reviewText" rows="3" placeholder="Tulis pengalaman order kamu" required></textarea>
               </label>
-              <button class="review-button" type="submit">Tampilkan Review di Website</button>
+              <div class="review-button-block">
+                <button class="review-button" type="submit">Tampilkan Review di Website</button>
+              </div>
             </form>
           </div>
         </section>
