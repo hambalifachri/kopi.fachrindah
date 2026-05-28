@@ -1693,3 +1693,54 @@ textarea:focus {
 .option-grid.one {
   grid-template-columns: 1fr;
 }
+
+/* Gaya untuk Scroll Screenshot WA */
+.ss-wa-gallery {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 4px 0 16px;
+  scroll-snap-type: x mandatory;
+}
+
+.ss-wa-gallery::-webkit-scrollbar {
+  height: 6px;
+}
+
+.ss-wa-gallery::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 999px;
+}
+
+.ss-wa-gallery img {
+  flex: 0 0 auto;
+  width: clamp(140px, 40vw, 200px); /* Ukuran responsif */
+  height: auto;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 2px solid var(--line);
+  box-shadow: 0 8px 16px rgba(43, 23, 16, 0.08);
+  scroll-snap-align: start;
+}
+
+/* Label Best Seller */
+.menu-card.best-seller {
+  position: relative;
+}
+
+.menu-card.best-seller::before {
+  content: "🔥 BEST SELLER";
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 10px;
+  color: #fff;
+  background: #e98425; /* Warna orange menarik */
+  border-radius: 999px;
+  font-size: 0.6rem;
+  font-weight: 900;
+  z-index: 2;
+  white-space: nowrap;
+  box-shadow: 0 4px 10px rgba(233, 132, 37, 0.4);
+}

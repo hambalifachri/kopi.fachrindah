@@ -22,7 +22,7 @@ const menuItems = [
   { id: "dua-shot-og-aren", group: "coffee", name: "Dua Shot OG Aren", oldPrice: 25000, price: 16500, largePrice: 23500, allowBeans: true, allowOatside: true, noSugar: true, color: "#d7a36c", foam: "#fff2dc", drizzle: "#76401f" },
   { id: "mocha-caramel", group: "coffee", name: "Mocha Caramel", oldPrice: 26000, price: 17000, largePrice: 24000, jumboPrice: 34000, allowBeans: true, allowOatside: true, noSugar: true, color: "#70402c", foam: "#f4dcc4", drizzle: "#3b1c12" },
   { id: "cafe-malt-latte", group: "coffee", name: "Cafe Malt Latte", oldPrice: 23000, price: 15500, largePrice: 22500, color: "#2f2922", foam: "#e2c696", drizzle: "#b17a37" },
-  { id: "kopi-kenangan-mantan", group: "coffee", name: "Kopi Kenangan Mantan", oldPrice: 19000, price: 12500, largePrice: 18500, jumboPrice: 28500, allowBeans: true, allowOatside: true, color: "#8d4a27", foam: "#f3d3b1", drizzle: "#5d2d19" },
+  { id: "kopi-kenangan-mantan", group: "coffee", name: "Kopi Kenangan Mantan", isBestSeller: true, oldPrice: 19000, price: 12500, largePrice: 18500, jumboPrice: 28500, allowBeans: true, allowOatside: true, color: "#8d4a27", foam: "#f3d3b1", drizzle: "#5d2d19" },
   { id: "caramel-latte", group: "coffee", name: "Caramel Latte", oldPrice: 26000, price: 16000, largePrice: 24000, jumboPrice: 33000, allowBeans: true, allowOatside: true, color: "#b45b23", foam: "#fff0dc", drizzle: "#a04b19" },
   { id: "dua-shot-iced-shaken", group: "coffee", name: "Dua Shot Iced Shaken", oldPrice: 28000, price: 17000, largePrice: 27000, jumboPrice: 36000, allowBeans: true, allowOatside: true, noHot: true, color: "#d56419", foam: "#ffe4c6", drizzle: "#ee8d24" },
   { id: "caramel-macchiato", group: "coffee", name: "Caramel Macchiato", oldPrice: 28000, price: 17000, largePrice: 27000, jumboPrice: 36000, allowBeans: true, allowOatside: true, color: "#bd6a2d", foam: "#fff2dc", drizzle: "#a75a20" },
@@ -39,7 +39,7 @@ const menuItems = [
   { id: "vanilla-latte", group: "coffee", name: "Vanilla Latte", oldPrice: 26000, price: 16000, largePrice: 24000, jumboPrice: 33000, allowBeans: true, allowOatside: true, color: "#bd6427", foam: "#fff3de", drizzle: "#edc77e" },
   { id: "avocado-coffee", group: "coffee", name: "Avocado Coffee", oldPrice: 28000, price: 17000, largePrice: 27000, jumboPrice: 36000, allowBeans: true, allowOatside: true, color: "#6d7d3d", foam: "#c8df88", drizzle: "#3f5528" },
   { id: "spanish-latte", group: "coffee", name: "Spanish Latte", oldPrice: 19000, price: 12500, largePrice: 20500, jumboPrice: 29500, allowBeans: true, allowOatside: false, noSugar: true, color: "#a25a2a", foam: "#f8efe4", drizzle: "#d7a16b" },
-  { id: "creany-aren-latte", group: "coffee", name: "Creamy Aren Latte", oldPrice: 22000, price: 14000, largePrice: 23000, jumboPrice: 32000, allowBeans: true, allowOatside: false, noSugar: true, color: "#8f4a24", foam: "#f1dbc5", drizzle: "#6c341b" },
+  { id: "creamy-aren-latte", group: "coffee", name: "Creamy Aren Latte", oldPrice: 22000, price: 14000, largePrice: 23000, jumboPrice: 32000, allowBeans: true, allowOatside: false, noSugar: true, color: "#8f4a24", foam: "#f1dbc5", drizzle: "#6c341b" },
   { id: "butterscotch-aren-latte", group: "coffee", name: "Butterscotch Aren Latte", oldPrice: 20000, price: 14000, largePrice: 21000, jumboPrice: 30000, allowBeans: true, allowOatside: true, noSugar: true, color: "#b46b2d", foam: "#f3d2a7", drizzle: "#81501e" },
   { id: "butterscotch-sea-salt-latte", group: "coffee", name: "Butterscotch Sea Salt Latte", oldPrice: 25000, price: 15500, largePrice: 23500, jumboPrice: 32500, allowBeans: true, allowOatside: true, noSugar: true, color: "#bd6426", foam: "#fff1d9", drizzle: "#c68a47" },
   { id: "americano", group: "coffee", name: "Americano", oldPrice: 17000, price: 11500, largePrice: 16500, jumboPrice: 23500, allowBeans: true, allowOatside: false, color: "#3f2016", foam: "#5a3020", drizzle: "#2a120c" },
@@ -255,8 +255,15 @@ function menuVisual(item) {
   return `<div class="menu-visual ${kind}" style="${style}" aria-hidden="true"><i></i><i></i><i></i><b></b><span class="foam"></span><span class="drizzle"></span><span class="heart"></span></div>`;
 }
 
+// Ganti fungsi menuCard lama dengan ini:
 function menuCard(item) {
-  return `<article class="menu-card ${item.isNew ? "new" : ""}">${menuVisual(item)}<h3>${item.name}</h3>${item.oldPrice ? `<span class="old-price">${rupiah.format(item.oldPrice)}</span>` : ""}<span class="price">${rupiah.format(item.price)}</span><button class="add-button" type="button" data-id="${item.id}">Tambah</button></article>`;
+  return `<article class="menu-card ${item.isNew ? "new" : ""} ${item.isBestSeller ? "best-seller" : ""}">
+    ${menuVisual(item)}
+    <h3>${item.name}</h3>
+    ${item.oldPrice ? `<span class="old-price">${rupiah.format(item.oldPrice)}</span>` : ""}
+    <span class="price">${rupiah.format(item.price)}</span>
+    <button class="add-button" type="button" data-id="${item.id}">Tambah</button>
+  </article>`;
 }
 
 function normalizeText(value) { return String(value).toLowerCase().trim(); }
