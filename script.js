@@ -592,7 +592,11 @@ async function saveOrderToSupabase(order) {
   if (error) throw error;
 }
 
-function isFoodItem(item) { return ["food", "chef-martin", "kenangan-toast"].includes(item.group); }
+function isFoodItem(item) { 
+  // Menu akan langsung masuk keranjang (tanpa popup opsi) jika grupnya adalah makanan ATAU mengandung kata "promo"
+  return ["food", "chef-martin", "kenangan-toast"].includes(item.group) || 
+         (item.group && item.group.includes("promo")); 
+}
 
 function resetSelectedOptions() {
   selectedOptions.temperature = "Ice";
@@ -746,11 +750,13 @@ function selectItemForOptions(id) {
     syncIceOptions();
   }
 
+const isBundle = item.group && item.group.includes("promo");
+
   selectedDrink.innerHTML = `
     <span>MENU DIPILIH</span>
     <strong id="modalProductTitleName">${item.name}</strong>
     <span id="modalItemPrice" style="font-size: 1.1rem; color: #d35c19; font-weight: 800; display: block; margin-top: 4px;">Rp0</span>
-    <small>${isFood ? "Menu makanan langsung masuk keranjang." : "Sesuaikan rasa minuman kamu di bawah ini."}</small>
+    <small>${isBundle ? "Tulis request Ice/Sugar untuk paket ini di kolom Catatan saat Checkout." : (isFood ? "Menu makanan langsung masuk keranjang." : "Sesuaikan rasa minuman kamu di bawah ini.")}</small>
   `;
 
   updateModalLivePrice(item);
@@ -889,12 +895,18 @@ closeOrderModalButton.addEventListener("click", () => closeOrderModal());
 continueShoppingButton.addEventListener("click", () => closeOrderModal());
 
 // FIX: Memperbaiki aksi klik tombol "Selesai, Bayar QRIS"
+// FIX: Memperbaiki aksi klik tombol "Selesai, Bayar QRIS" dengan pengecualian Bundling
 goCheckoutButton.addEventListener("click", () => { 
   const totalQty = getCartQuantity();
-  if (totalQty >= 2) { 
+  
+  // Mengecek apakah di dalam keranjang ada item yang grupnya mengandung kata "promo"
+  const hasBundling = [...cart.values()].some(item => item.group && item.group.includes("promo"));
+
+  // Izinkan checkout jika jumlah >= 2 ATAU ada menu bundling di keranjang
+  if (totalQty >= 2 || hasBundling) { 
     setModalStage("checkout"); 
   } else {
-    alert(`Pesanan baru ${totalQty} menu. Minimal pemesanan adalah 2 menu.`);
+    alert(`Pesanan kamu baru ${totalQty} menu. Minimal pemesanan adalah 2 menu satuan (Kecuali untuk pembelian Paket Promo / Bundling).`);
   }
 });
 
