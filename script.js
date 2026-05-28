@@ -41,19 +41,19 @@ const menuItems = [
   { id: "spanish-latte", group: "coffee", name: "Spanish Latte", oldPrice: 19000, price: 12500, largePrice: 20500, jumboPrice: 29500, allowBeans: true, allowOatside: false, noSugar: true, color: "#a25a2a", foam: "#f8efe4", drizzle: "#d7a16b" },
   { id: "creamy-aren-latte", group: "coffee", name: "Creamy Aren Latte", oldPrice: 22000, price: 14000, largePrice: 23000, jumboPrice: 32000, allowBeans: true, allowOatside: false, noSugar: true, color: "#8f4a24", foam: "#f1dbc5", drizzle: "#6c341b" },
   { id: "butterscotch-aren-latte", group: "coffee", name: "Butterscotch Aren Latte", oldPrice: 20000, price: 14000, largePrice: 21000, jumboPrice: 30000, allowBeans: true, allowOatside: true, noSugar: true, color: "#b46b2d", foam: "#f3d2a7", drizzle: "#81501e" },
-  { id: "butterscotch-sea-salt-latte", group: "coffee", name: "Butterscotch Sea Salt Latte", oldPrice: 25000, price: 15500, largePrice: 23500, jumboPrice: 32500, allowBeans: true, allowOatside: true, noSugar: true, color: "#bd6426", foam: "#fff1d9", drizzle: "#c68a47" },
+  { id: "butterscotch-sea-salt-latte", group: "coffee", name: "Butterscotch Sea Salt Latte", isBestSeller: true, oldPrice: 25000, price: 15500, largePrice: 23500, jumboPrice: 32500, allowBeans: true, allowOatside: true, noSugar: true, color: "#bd6426", foam: "#fff1d9", drizzle: "#c68a47" },
   { id: "americano", group: "coffee", name: "Americano", oldPrice: 17000, price: 11500, largePrice: 16500, jumboPrice: 23500, allowBeans: true, allowOatside: false, color: "#3f2016", foam: "#5a3020", drizzle: "#2a120c" },
   { id: "cappuccino", group: "coffee", name: "Cappuccino", oldPrice: 22000, price: 14000, largePrice: 21000, jumboPrice: 30000, allowBeans: true, allowOatside: true, color: "#b4612c", foam: "#fff3e5", drizzle: "#c98c52" },
   { id: "latte", group: "coffee", name: "Latte", oldPrice: 22000, price: 14000, largePrice: 21000, jumboPrice: 30000, allowBeans: true, allowOatside: true, color: "#c06a31", foam: "#fff0df", drizzle: "#dfb07e" },
 
   // Kategori: Non-Coffee
   { id: "nc-og-thai-tea", group: "non-coffee", name: "OG Thai Tea", oldPrice: 19000, price: 12500, largePrice: 16500, jumboPrice: 23500, allowOatside: false, noSugar: true, color: "#e56d17", foam: "#fff1df", drizzle: "#d35c19", isNew: true, noHot: false },
-  { id: "nc-thai-tea-loaded", group: "non-coffee", name: "Thai Tea Loaded", oldPrice: 27000, price: 16000, largePrice: 16500, allowBeans: false, allowOatside: false, noSugar: true, color: "#cf6b20", foam: "#fff4e5", drizzle: "#5b2f1b", isNew: true, noRegular: true, noHot: true },
+  { id: "nc-thai-tea-loaded", group: "non-coffee", name: "Thai Tea Loaded", isBestSeller: true, oldPrice: 27000, price: 16000, largePrice: 16500, allowBeans: false, allowOatside: false, noSugar: true, color: "#cf6b20", foam: "#fff4e5", drizzle: "#5b2f1b", isNew: true, noRegular: true, noHot: true },
   { id: "nc-thai-tea-aren", group: "non-coffee", name: "Thai Tea Aren", oldPrice: 24000, price: 15000, largePrice: 15000, jumboPrice: 22000, allowBeans: false, allowOatside: false, color: "#bd5b1d", foam: "#f4d09c", drizzle: "#7c3f1f", isNew: true, noSugar: true, noRegular: true },
   { id: "og-aren-milky-speculoos", group: "non-coffee", name: "OG Aren Milky Speculoos", oldPrice: 23000, price: 16000, largePrice: 16000, jumboPrice: 23000, allowBeans: false, allowOatside: false, color: "#d7a36c", foam: "#fff2dc", drizzle: "#76401f", noSugar: true, noRegular: true },
   { id: "choco-caramel", group: "non-coffee", name: "Choco Caramel", oldPrice: 19000, price: 13000, largePrice: 20000, jumboPrice: 30000, allowOatside: true, color: "#71402c", foam: "#f5d4bd", drizzle: "#3b1c12", noSugar: true },
   { id: "toffee-nut-choco-macchiato", group: "non-coffee", name: "Toffee Nut Choco Macchiato", oldPrice: 22000, price: 15000, allowBeans: false, allowOatside: true, color: "#7a4027", foam: "#f0d1a6", drizzle: "#b17428", noSugar: true },
-  { id: "butterscotch-sea-salt-macchiato", group: "non-coffee", name: "Butterscotch Sea Salt Macchiato", oldPrice: 22000, price: 15000, allowBeans: false, allowOatside: true, color: "#e3bd82", foam: "#fff3db", drizzle: "#bd7b32" },
+  { id: "butterscotch-sea-salt-macchiato", group: "non-coffee", name: "Butterscotch Sea Salt Macchiato", isBestSeller: true, oldPrice: 22000, price: 15000, allowBeans: false, allowOatside: true, color: "#e3bd82", foam: "#fff3db", drizzle: "#bd7b32" },
   { id: "milk-oreo-crumble", group: "non-coffee", name: "Milk Oreo Crumble", oldPrice: 26000, price: 17000, allowBeans: false, allowOatside: true, color: "#f6f2e9", foam: "#ffffff", drizzle: "#111111", noHot: true },
   { id: "babyccino", group: "non-coffee", name: "Babyccino", oldPrice: 19000, price: 13000, allowBeans: false, allowOatside: true, color: "#f0dfc2", foam: "#fff8ef", drizzle: "#bc7b28" },
   { id: "fresh-lemonade", group: "non-coffee", name: "Fresh Lemonade", oldPrice: 17000, price: 11500, largePrice: 11500, jumboPrice: 21500, allowOatside: false, color: "#f4d23c", foam: "#fff2a5", drizzle: "#e6aa18", noHot: true, noRegular: true },
@@ -270,25 +270,61 @@ function normalizeText(value) { return String(value).toLowerCase().trim(); }
 
 function renderMenu(query = "") {
   const normalizedQuery = normalizeText(query);
-  categoryNav.innerHTML = categories.map((category) => `<a href="#${category.id}">${category.title}</a>`).join("");
+  
+  // 1. Tambahkan menu "Best Seller" di awal navigasi kategori
+  categoryNav.innerHTML = `<a href="#best-seller">🔥 Best Seller</a>` + 
+                          categories.map((category) => `<a href="#${category.id}">${category.title}</a>`).join("");
 
-  let resultCount = 0;
-  catalogContainer.innerHTML = categories.map((category) => {
+  let htmlOutput = "";
+  let foundItems = new Set(); // Pakai Set agar menu yang muncul 2 kali tidak dihitung dobel saat dicari
+
+  // 2. Buat bagian khusus Best Seller di paling atas
+  const bestSellers = menuItems.filter((item) => {
+    if (!item.isBestSeller) return false;
+    if (!normalizedQuery) return true;
+    return normalizeText(item.name).includes(normalizedQuery);
+  });
+
+  if (bestSellers.length > 0) {
+    bestSellers.forEach(item => foundItems.add(item.id));
+    htmlOutput += `
+    <section class="catalog-section" id="best-seller">
+      <h2>🔥 Best Seller</h2>
+      <div class="menu-grid">${bestSellers.map(menuCard).join("")}</div>
+    </section>`;
+  }
+
+  // 3. Render kategori lain di bawahnya
+  htmlOutput += categories.map((category) => {
     const categoryMatches = normalizeText(category.title).includes(normalizedQuery);
     const items = menuItems.filter((item) => {
       if (item.group !== category.id) return false;
       if (!normalizedQuery) return true;
       return categoryMatches || normalizeText(item.name).includes(normalizedQuery);
     });
+
+    // Urutkan item: yang Best Seller ditaruh di posisi terdepan pada masing-masing kategori
+    items.sort((a, b) => (b.isBestSeller === true ? 1 : 0) - (a.isBestSeller === true ? 1 : 0));
+
     if (items.length === 0) return "";
-    resultCount += items.length;
-    return `<section class="catalog-section" id="${category.id}"><h2>${category.title}</h2><div class="menu-grid">${items.map(menuCard).join("")}</div></section>`;
+    items.forEach(item => foundItems.add(item.id));
+    
+    return `<section class="catalog-section" id="${category.id}">
+      <h2>${category.title}</h2>
+      <div class="menu-grid">${items.map(menuCard).join("")}</div>
+    </section>`;
   }).join("");
 
-  if (normalizedQuery && resultCount === 0) {
+  catalogContainer.innerHTML = htmlOutput;
+
+  // 4. Update status teks pencarian
+  if (normalizedQuery && foundItems.size === 0) {
     catalogContainer.innerHTML = '<p class="no-results">Menu tidak ditemukan. Coba kata lain.</p>';
   }
-  searchStatus.textContent = normalizedQuery ? `${resultCount} menu ditemukan untuk "${query}".` : `${menuItems.length} menu tersedia.`;
+  
+  searchStatus.textContent = normalizedQuery ? 
+    `${foundItems.size} menu ditemukan untuk "${query}".` : 
+    `${menuItems.length} menu tersedia.`;
 }
 
 function renderCart() {
@@ -563,7 +599,18 @@ function addItem(id) {
   if (!item) return;
 
   const options = isFoodItem(item) ? {} : { ...selectedOptions };
+  
+  // PERBAIKAN: Bersihkan memori opsi jika menu tidak mendukung fitur tersebut
+  if (!isFoodItem(item)) {
+    if (!item.allowBeans) delete options.beans;
+    if (!item.allowOatside) delete options.milk;
+    
+    // Opsional: Hapus teks "Regular" jika menu tidak punya pilihan Large/Jumbo
+    if (!item.largePrice && !item.jumboPrice) delete options.size;
+  }
+
   const calculatedPrice = calculateItemPrice(item, options);
+  // cartKey akan men-generate ID unik berdasarkan opsi yang tersisa
   const cartKey = `${id}|${Object.values(options).join("|")}`;
   const current = cart.get(cartKey);
 
