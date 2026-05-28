@@ -1,15 +1,141 @@
 const categories = [
-  { id: "promo-combo", title: "Promo & Combo" },
+  { id: "promo-50k", title: "Promo 50K" },
+  { id: "promo-60k", title: "Promo 60K" },
+  { id: "promo-70k", title: "Promo 70K" },
   { id: "baru", title: "Baru!" },
   { id: "coffee", title: "Coffee" },
   { id: "non-coffee", title: "Non Coffee" },
   { id: "kenangan-frappe", title: "Kenangan Frappe" },
-  { id: "chef-martin", title: "Chef Martin Praja's Signature Bake" },
+  { id: "chef-martin", title: "Chef Martin Praja's Bake" },
   { id: "kenangan-toast", title: "Kenangan Toast" },
   { id: "food", title: "Food" },
 ];
 
 const menuItems = [
+
+// ==========================================
+  // KATEGORI PROMO 50K (Total 8 Paket)
+  // ==========================================
+  { 
+    id: "bundle-50k-1", group: "promo-50k", name: "Paket 50K 1 (Vanilla Latte + Choco Chip Cookies + Sugar Donut)", 
+    oldPrice: 36000, price: 33000, kind: "food", color: "#bd6427",
+    bundleImages: ["menu_34.jpg", "menu_119.jpg", "menu_116.jpg"] 
+  },
+  { 
+    id: "bundle-50k-2", group: "promo-50k", name: "Paket 50K 2 (Kenangan Milk Tea + Americano + Strawberry Choux Puff)", 
+    oldPrice: 35000, price: 32000, kind: "food", color: "#bf8a56",
+    bundleImages: ["menu_68.jpg", "menu_40.jpg", "menu_96.jpg"] 
+  },
+  { 
+    id: "bundle-50k-3", group: "promo-50k", name: "Paket 50K 3 (Kopi Kenangan Mantan + Babyccino + Chocolate Choux Puff)", 
+    oldPrice: 34500, price: 31500, kind: "food", color: "#8d4a27",
+    bundleImages: ["menu_20.jpg", "menu_65.jpg", "menu_103.jpg"] 
+  },
+  { 
+    id: "bundle-50k-4", group: "promo-50k", name: "Paket 50K 4 (Tiramisu Frappe + Donut Almond + Roti Coklat Klasik)", 
+    oldPrice: 35000, price: 32000, kind: "food", color: "#6d3b2a",
+    bundleImages: ["menu_79.jpg", "menu_108.jpg", "menu_117.jpg"] 
+  },
+  { 
+    id: "bundle-50k-5", group: "promo-50k", name: "Paket 50K 5 (Avocado Milk + Roti Gulung Abon + Roti Coklat Klasik)", 
+    oldPrice: 36000, price: 33000, kind: "food", color: "#b4cf49",
+    bundleImages: ["menu_57.jpg", "menu_99.jpg", "menu_117.jpg"] 
+  },
+  { 
+    id: "bundle-50k-6", group: "promo-50k", name: "Paket 50K 6 (Raspberry Hibiscus + Tiramisu Latte + Sugar Donut)", 
+    oldPrice: 35500, price: 32500, kind: "food", color: "#df253c",
+    bundleImages: ["menu_71.jpg", "menu_25.jpg", "menu_116.jpg"] 
+  },
+  { 
+    id: "bundle-50k-7", group: "promo-50k", name: "Paket 50K 7 (Matcha Latte + Canele Aren + Sugar Donut)", 
+    oldPrice: 36000, price: 33000, kind: "food", color: "#4f9c3c",
+    bundleImages: ["menu_73.jpg", "menu_93.jpg", "menu_116.jpg"] 
+  },
+
+  // ==========================================
+  // KATEGORI PROMO 60K (Total 8 Paket)
+  // ==========================================
+  { 
+    id: "bundle-60k-1", group: "promo-60k", name: "Paket 60K 1 (Caramel Macchiato + Cappuccino + Sugar Donut)", 
+    oldPrice: 39000, price: 36000, kind: "food", color: "#bd6a2d",
+    bundleImages: ["menu_23.jpg", "menu_41.jpg", "menu_116.jpg"] 
+  },
+  { 
+    id: "bundle-60k-2", group: "promo-60k", name: "Paket 60K 2 (Matcha Kenangan Frappe + Kopi Kenangan Mantan + Roti Coklat Klasik)", 
+    oldPrice: 40000, price: 37000, kind: "food", color: "#69a63b",
+    bundleImages: ["menu_81.jpg", "menu_20.jpg", "menu_117.jpg"] 
+  },
+  { 
+    id: "bundle-60k-3", group: "promo-60k", name: "Paket 60K 3 (Vanilla Kenangan Frappe + Hazelnut Choco Milk Tea + Roti Keju Manis)", 
+    oldPrice: 42500, price: 40000, kind: "food", color: "#f5f0e7",
+    bundleImages: ["menu_83.jpg", "menu_55.jpg", "menu_118.jpg"] 
+  },
+  { 
+    id: "bundle-60k-4", group: "promo-60k", name: "Paket 60K 4 (Oreo Shake + Kopi Susu Black Aren + Canele Original)", 
+    oldPrice: 40000, price: 37000, kind: "food", color: "#f1eee7",
+    bundleImages: ["menu_70.jpg", "menu_31.jpg", "menu_106.jpg"] 
+  },
+  { 
+    id: "bundle-60k-5", group: "promo-60k", name: "Paket 60K 5 (Butterscotch Kenangan Frappe + Blueberry Muffin + Canele Aren)", 
+    oldPrice: 41000, price: 38000, kind: "food", color: "#d59a32",
+    bundleImages: ["menu_80.jpg", "menu_95.jpg", "menu_93.jpg"] 
+  },
+  { 
+    id: "bundle-60k-6", group: "promo-60k", name: "Paket 60K 6 (Thai Tea Aren + Susu Grass Jelly + Chocolate Choux Puff)", 
+    oldPrice: 40000, price: 37000, kind: "food", color: "#bd5b1d",
+    bundleImages: ["menu_3.jpg", "menu_72.jpg", "menu_103.jpg"] 
+  },
+  { 
+    id: "bundle-60k-7", group: "promo-60k", name: "Paket 60K 7 (Kopi Kenangan Mantan Frappe + Butterscotch Aren Latte + Donut Almond)", 
+    oldPrice: 42000, price: 40000, kind: "food", color: "#9f5a2f",
+    bundleImages: ["menu_82.jpg", "menu_38.jpg", "menu_108.jpg"] 
+  },
+
+  { 
+    id: "bundle-60k-large", group: "promo-60k", name: "Paket 60k (Tiramisu Latte LARGE + Cafe Malt Latte + Sugar Donut)", 
+    oldPrice: 44000, price: 41000, kind: "food", color: "#a16643",
+    bundleImages: ["menu_25.jpg", "menu_19.jpg", "menu_116.jpg"] 
+  },
+
+  // ==========================================
+  // KATEGORI PROMO 70K (Total 8 Paket)
+  // ==========================================
+  { 
+    id: "bundle-70k-1", group: "promo-70k", name: "Paket Sultan 70K 1 (Avocado Caramel + Mocha Latte + Choco Chip Cookies)", 
+    oldPrice: 47000, price: 44000, kind: "food", color: "#afc94f",
+    bundleImages: ["menu_56.jpg", "menu_33.jpg", "menu_119.jpg"] 
+  },
+  { 
+    id: "bundle-70k-2", group: "promo-70k", name: "Paket Sultan 70K 2 (Matcha Kenangan Frappe + Caramel Dutch Choco + Sugar Donut)", 
+    oldPrice: 46000, price: 43000, kind: "food", color: "#69a63b",
+    bundleImages: ["menu_81.jpg", "menu_58.jpg", "menu_116.jpg"] 
+  },
+  { 
+    id: "bundle-70k-3", group: "promo-70k", name: "Paket Sultan 70K 3 (Caramel Dutch Choco + Thai Tea Coffee + Danish Tiramisu)", 
+    oldPrice: 46500, price: 45000, kind: "food", color: "#6b3326",
+    bundleImages: ["menu_59.jpg", "menu_4.jpg", "menu_104.jpg"] 
+  },
+  { 
+    id: "bundle-70k-4", group: "promo-70k", name: "Paket Sultan 70K 4 (Butterscotch Kenangan Frappe + Milo Dino + Bambang Choco Cheese)", 
+    oldPrice: 49000, price: 46000, kind: "food", color: "#d59a32",
+    bundleImages: ["menu_80.jpg", "menu_69.jpg", "menu_109.jpg"] 
+  },
+  { 
+    id: "bundle-70k-5", group: "promo-70k", name: "Paket Sultan 70K 5 (Dutch Choco Kenangan Frappe + Toffee Nut Oat Latte + Chocolate Croissant)", 
+    oldPrice: 47500, price: 45000, kind: "food", color: "#5a2d25",
+    bundleImages: ["menu_84.jpg", "menu_29.jpg", "menu_115.jpg"] 
+  },
+  { 
+    id: "bundle-70k-6", group: "promo-70k", name: "Paket Sultan 70K 6 (Thai Tea Loaded + Milk Oreo Crumble + Aren Apple Pie)", 
+    oldPrice: 45000, price: 43000, kind: "food", color: "#cf6b20",
+    bundleImages: ["menu_50.jpg", "menu_64.jpg", "menu_94.jpg"] 
+  },
+  { 
+    id: "bundle-70k-7", group: "promo-70k", name: "Paket Sultan 70K 7 (Caramel Macchiato + Avocado Coffee + Choco Chip Cookies)", 
+    oldPrice: 46000, price: 43000, kind: "food", color: "#bd6a2d",
+    bundleImages: ["menu_23.jpg", "menu_35.jpg", "menu_119.jpg"] 
+  },
+
   // Kategori: Baru!
   { id: "og-thai-tea", group: "baru", name: "OG Thai Tea", oldPrice: 19000, price: 12500, largePrice: 16500, jumboPrice: 23500, allowOatside: false, noSugar: true, color: "#e56d17", foam: "#fff1df", drizzle: "#d35c19", isNew: true, noHot: false },
   { id: "thai-tea-loaded", group: "baru", name: "Thai Tea Loaded", oldPrice: 27000, price: 16000, largePrice: 16500, allowBeans: false, allowOatside: false, noSugar: true, color: "#cf6b20", foam: "#fff4e5", drizzle: "#5b2f1b", isNew: true, noRegular: true, noHot: true },
@@ -247,9 +373,20 @@ const selectedDrink = document.querySelector("#selectedDrink");
 const addConfiguredItemButton = document.querySelector("#addConfiguredItem");
 
 function menuVisual(item) {
+  // KHUSUS UNTUK MENU BUNDLE (KOLASE FOTO)
+  if (item.bundleImages && item.bundleImages.length > 0) {
+    const collageClass = `items-${item.bundleImages.length}`;
+    return `<div class="photo-frame bundle-collage ${collageClass}">
+      ${item.bundleImages.map(img => `<img src="assets/menu/${img}" alt="Bundle Item" loading="lazy" />`).join('')}
+    </div>`;
+  }
+  
+  // UNTUK MENU SATUAN BIASA
   if (item.image) {
     return `<div class="photo-frame ${item.kind || "drink"}"><img src="${item.image}" alt="${item.name}" loading="lazy" /></div>`;
   }
+  
+  // UNTUK MENU YANG TIDAK ADA FOTONYA (MENGGUNAKAN GAMBAR CSS)
   const style = `--cup-color: ${item.color || "#a84e1e"}; --foam-color: ${item.foam || "#fff2df"}; --drizzle-color: ${item.drizzle || "#ffffff"}`;
   const kind = item.kind || "drink";
   return `<div class="menu-visual ${kind}" style="${style}" aria-hidden="true"><i></i><i></i><i></i><b></b><span class="foam"></span><span class="drizzle"></span><span class="heart"></span></div>`;
