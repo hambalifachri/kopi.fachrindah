@@ -10,7 +10,7 @@ const categories = [
 ];
 
 const menuItems = [
-  // Kategori: Baru! (Contoh ditambahkan properti noHot: true)
+  // Kategori: Baru!
   { id: "og-thai-tea", group: "baru", name: "OG Thai Tea", oldPrice: 19000, price: 12500, largePrice: 16500, jumboPrice: 23500, allowOatside: false, noSugar: true, color: "#e56d17", foam: "#fff1df", drizzle: "#d35c19", isNew: true, noHot: false },
   { id: "thai-tea-loaded", group: "baru", name: "Thai Tea Loaded", oldPrice: 27000, price: 16000, largePrice: 16500, allowBeans: false, allowOatside: false, noSugar: true, color: "#cf6b20", foam: "#fff4e5", drizzle: "#5b2f1b", isNew: true, noRegular: true, noHot: true },
   { id: "thai-tea-aren", group: "baru", name: "Thai Tea Aren", oldPrice: 24000, price: 15000, largePrice: 15000, jumboPrice: 22000, allowBeans: false, allowOatside: false, color: "#bd5b1d", foam: "#f4d09c", drizzle: "#7c3f1f", isNew: true, noSugar: true, noRegular: true },
@@ -39,14 +39,14 @@ const menuItems = [
   { id: "vanilla-latte", group: "coffee", name: "Vanilla Latte", oldPrice: 26000, price: 16000, largePrice: 24000, jumboPrice: 33000, allowBeans: true, allowOatside: true, color: "#bd6427", foam: "#fff3de", drizzle: "#edc77e" },
   { id: "avocado-coffee", group: "coffee", name: "Avocado Coffee", oldPrice: 28000, price: 17000, largePrice: 27000, jumboPrice: 36000, allowBeans: true, allowOatside: true, color: "#6d7d3d", foam: "#c8df88", drizzle: "#3f5528" },
   { id: "spanish-latte", group: "coffee", name: "Spanish Latte", oldPrice: 19000, price: 12500, largePrice: 20500, jumboPrice: 29500, allowBeans: true, allowOatside: false, noSugar: true, color: "#a25a2a", foam: "#f8efe4", drizzle: "#d7a16b" },
-  { id: "creamy-aren-latte", group: "coffee", name: "Creamy Aren Latte", oldPrice: 22000, price: 14000, largePrice: 23000, jumboPrice: 32000, allowBeans: true, allowOatside: false, noSugar: true, color: "#8f4a24", foam: "#f1dbc5", drizzle: "#6c341b" },
+  { id: "creany-aren-latte", group: "coffee", name: "Creamy Aren Latte", oldPrice: 22000, price: 14000, largePrice: 23000, jumboPrice: 32000, allowBeans: true, allowOatside: false, noSugar: true, color: "#8f4a24", foam: "#f1dbc5", drizzle: "#6c341b" },
   { id: "butterscotch-aren-latte", group: "coffee", name: "Butterscotch Aren Latte", oldPrice: 20000, price: 14000, largePrice: 21000, jumboPrice: 30000, allowBeans: true, allowOatside: true, noSugar: true, color: "#b46b2d", foam: "#f3d2a7", drizzle: "#81501e" },
   { id: "butterscotch-sea-salt-latte", group: "coffee", name: "Butterscotch Sea Salt Latte", oldPrice: 25000, price: 15500, largePrice: 23500, jumboPrice: 32500, allowBeans: true, allowOatside: true, noSugar: true, color: "#bd6426", foam: "#fff1d9", drizzle: "#c68a47" },
   { id: "americano", group: "coffee", name: "Americano", oldPrice: 17000, price: 11500, largePrice: 16500, jumboPrice: 23500, allowBeans: true, allowOatside: false, color: "#3f2016", foam: "#5a3020", drizzle: "#2a120c" },
   { id: "cappuccino", group: "coffee", name: "Cappuccino", oldPrice: 22000, price: 14000, largePrice: 21000, jumboPrice: 30000, allowBeans: true, allowOatside: true, color: "#b4612c", foam: "#fff3e5", drizzle: "#c98c52" },
   { id: "latte", group: "coffee", name: "Latte", oldPrice: 22000, price: 14000, largePrice: 21000, jumboPrice: 30000, allowBeans: true, allowOatside: true, color: "#c06a31", foam: "#fff0df", drizzle: "#dfb07e" },
 
-  // Kategori: Non-Coffee (Contoh ditambahkan properti noHot: true untuk Frappe/Ice Blend bawaan)
+  // Kategori: Non-Coffee
   { id: "nc-og-thai-tea", group: "non-coffee", name: "OG Thai Tea", oldPrice: 19000, price: 12500, largePrice: 16500, jumboPrice: 23500, allowOatside: false, noSugar: true, color: "#e56d17", foam: "#fff1df", drizzle: "#d35c19", isNew: true, noHot: false },
   { id: "nc-thai-tea-loaded", group: "non-coffee", name: "Thai Tea Loaded", oldPrice: 27000, price: 16000, largePrice: 16500, allowBeans: false, allowOatside: false, noSugar: true, color: "#cf6b20", foam: "#fff4e5", drizzle: "#5b2f1b", isNew: true, noRegular: true, noHot: true },
   { id: "nc-thai-tea-aren", group: "non-coffee", name: "Thai Tea Aren", oldPrice: 24000, price: 15000, largePrice: 15000, jumboPrice: 22000, allowBeans: false, allowOatside: false, color: "#bd5b1d", foam: "#f4d09c", drizzle: "#7c3f1f", isNew: true, noSugar: true, noRegular: true },
@@ -71,7 +71,7 @@ const menuItems = [
   { id: "dutch-chocolate", group: "non-coffee", name: "Dutch Chocolate", oldPrice: 26000, price: 17000, largePrice: 27000, jumboPrice: 36000, allowBeans: false, allowOatside: true, color: "#6b3326", foam: "#e7c2a8", drizzle: "#39180f" },
   { id: "hazelnut-dutch-choco", group: "non-coffee", name: "Hazelnut Dutch Choco", oldPrice: 28000, price: 18000, largePrice: 28000, jumboPrice: 37000, allowBeans: false, allowOatside: true, color: "#78422b", foam: "#e8c6a9", drizzle: "#4c2217" },
 
-  // Kategori Frappe otomatis noHot: true
+  // Kategori Frappe
   { id: "tiramisu-frappe", group: "kenangan-frappe", name: "Tiramisu Frappe", oldPrice: 28000, price: 18000, largePrice: 18000, jumboPrice: 22000, allowBeans: true, allowOatside: true, color: "#6d3b2a", foam: "#f6efe7", drizzle: "#3a1c12", kind: "frappe", noHot: true },
   { id: "butterscotch-kenangan-frappe", group: "kenangan-frappe", name: "Butterscotch Kenangan Frappe", oldPrice: 30000, price: 20000, largePrice: 30000, allowBeans: true, allowOatside: true, color: "#d59a32", foam: "#fff3df", drizzle: "#b36a1f", kind: "frappe", noHot: true },
   { id: "matcha-kenangan-frappe", group: "kenangan-frappe", name: "Matcha Kenangan Frappe", oldPrice: 32000, price: 20000, largePrice: 30000, allowBeans: false, allowOatside: true, color: "#69a63b", foam: "#dcf0b3", drizzle: "#2f5d22", kind: "frappe", noHot: true },
@@ -79,7 +79,7 @@ const menuItems = [
   { id: "vanilla-kenangan-frappe", group: "kenangan-frappe", name: "Vanilla Kenangan Frappe", oldPrice: 25000, price: 17500, largePrice: 24500, allowBeans: false, allowOatside: true, color: "#f5f0e7", foam: "#ffffff", drizzle: "#e5d4bb", kind: "frappe", noHot: true },
   { id: "dutch-choco-kenangan-frappe", group: "kenangan-frappe", name: "Dutch Choco Kenangan Frappe", oldPrice: 29000, price: 19500, largePrice: 26500, allowBeans: false, allowOatside: true, color: "#5a2d25", foam: "#e9c4ad", drizzle: "#28110c", kind: "frappe", noHot: true },
 
-  // Kategori: Makanan (Tidak Punya Size, Beans, dan Oatside)
+  // Kategori: Makanan
   { id: "canele-aren", group: "chef-martin", name: "Canele Aren", oldPrice: 15000, price: 10500, kind: "food", color: "#6b3a24" },
   { id: "aren-apple-pie", group: "chef-martin", name: "Aren Apple Pie", oldPrice: 17000, price: 11500, kind: "food", color: "#d59441" },
   { id: "blueberry-muffin", group: "chef-martin", name: "Blueberry Muffin", oldPrice: 15000, price: 10500, kind: "food", color: "#d7a85b" },
@@ -88,7 +88,7 @@ const menuItems = [
   { id: "danish-tiramisu", group: "chef-martin", name: "Danish Tiramisu", oldPrice: 19000, price: 13000, kind: "food", color: "#7b4a2f" },
   { id: "salt-bread-original", group: "chef-martin", name: "Salt Bread Original", oldPrice: 11000, price: 9000, kind: "food", color: "#d9913c" },
   { id: "canele-original", group: "chef-martin", name: "Canele Original", oldPrice: 13000, price: 9500, kind: "food", color: "#7a432b" },
-  { id: "canele-toffee-nut-crumble", group: "chef-martin", name: "Canele Toffee Nut Crumble", oldPrice: 15000, price: 10500, kind: "food", color: "#8b4a2d" },
+  { id: "canele-toffee-nut-crumble", group: "chef-martin", name: "Canele Toffee Nut Crumble", oldPrice: 15000, price: 10500, kind: "food", color: "#8b4a32" },
   { id: "donut-almond", group: "chef-martin", name: "Donut Almond", oldPrice: 13000, price: 9500, kind: "food", color: "#d7a15b" },
   { id: "roti-gulung-abon", group: "chef-martin", name: "Roti Gulung Abon", oldPrice: 17000, price: 12500, kind: "food", color: "#c0702e" },
   
@@ -153,9 +153,6 @@ const productImages = {
   "raspberry-hibiscus": "menu_71.jpg",
   "susu-grass-jelly": "menu_72.jpg",
   "matcha-latte": "menu_73.jpg",
-  "seliter-matcha-latte": "menu_74.jpg",
-  "seliter-thai-tea": "menu_75.jpg",
-  "air-mineral": "menu_76.jpg",
   "hazelnut-choco-milk-tea": "menu_55.jpg",
   "avocado-caramel": "menu_56.jpg",
   "avocado-milk": "menu_57.jpg",
@@ -244,7 +241,6 @@ const goCheckoutButton = document.querySelector("#goCheckout");
 const backToCartButton = document.querySelector("#backToCart");
 const paymentProofInput = document.querySelector("#modalPaymentProof");
 const proofPreview = document.querySelector("#proofPreview");
-const proofHelp = document.querySelector("#proofHelp");
 const shareProofButton = document.querySelector("#shareProofButton");
 const optionGroups = document.querySelectorAll("[data-option-group]");
 const selectedDrink = document.querySelector("#selectedDrink");
@@ -323,6 +319,7 @@ function renderCheckoutSummary(entries, subtotal) {
 }
 
 function formatOptions(options) {
+  if (!options || Object.keys(options).length === 0) return "";
   if (options.temperature === "Hot") {
     return [options.temperature, options.size, options.beans, options.milk, options.sugar].filter(Boolean).join(" / ");
   }
@@ -460,13 +457,11 @@ function syncIceOptions() {
   
   if (selectedOptions.temperature === "Hot") {
     selectedOptions.ice = "No Ice";
-    // Menyembunyikan total kotak Ice Level demi estetika
     iceGroup.style.display = "none"; 
     iceButtons.forEach(btn => {
       btn.classList.toggle("selected", btn.dataset.optionValue === "No Ice");
     });
   } else {
-    // Memunculkan kembali jika menu adalah varian Ice
     iceGroup.style.display = "block"; 
     iceButtons.forEach(btn => btn.disabled = false);
   }
@@ -493,17 +488,15 @@ function selectItemForOptions(id) {
   const tempGrid = document.querySelector('[data-option-group="temperature"] .option-grid');
 
   if (!isFood) {
-    // LOGIKA FILTER NO HOT (DINAMIS)
     if (item.noHot && optHotBtn && tempGrid) {
       optHotBtn.style.display = "none";
-      tempGrid.className = "option-grid one"; // Merubah layout grid tombol temperature jadi 1 kolom full
+      tempGrid.className = "option-grid one"; 
       selectedOptions.temperature = "Ice";
     } else if (optHotBtn && tempGrid) {
       optHotBtn.style.display = "block";
-      tempGrid.className = "option-grid two"; // Mengembalikan layout grid ke 2 kolom normal
+      tempGrid.className = "option-grid two"; 
     }
 
-    // FITUR MENU HANYA LARGE (noRegular: true)
     if (item.noRegular) {
       if (optRegularBtn) optRegularBtn.style.display = "none";
       selectedOptions.size = "Large"; 
@@ -513,32 +506,27 @@ function selectItemForOptions(id) {
       if (optRegularBtn) optRegularBtn.style.display = "block";
     }
 
-    // Filter kemunculan tombol Large dan Jumbo
     if (item.largePrice) { optLargeBtn.style.display = "block"; } else { optLargeBtn.style.display = "none"; }
     if (item.jumboPrice) { optJumboBtn.style.display = "block"; } else { optJumboBtn.style.display = "none"; }
 
-    // Jika tidak ada Large & Jumbo, sembunyikan kotak Size sekalian
     if (!item.largePrice && !item.jumboPrice) {
       document.querySelector("#groupSize").style.display = "none";
     } else {
       document.querySelector("#groupSize").style.display = "block";
     }
 
-    // Filter Biji Kopi
     if (item.allowBeans) {
       document.querySelector("#groupBeans").style.display = "block";
     } else {
       document.querySelector("#groupBeans").style.display = "none";
     }
 
-    // Filter Pilihan Susu Oatside
     if (item.allowOatside) {
       document.querySelector("#groupMilk").style.display = "block";
     } else {
       document.querySelector("#groupMilk").style.display = "none";
     }
 
-    // LOGIKA FILTER NO SUGAR DINAMIS
     if (item.noSugar && optNoSugarBtn && sugarGrid) {
       optNoSugarBtn.style.display = "none";
       sugarGrid.className = "option-grid two"; 
@@ -547,7 +535,6 @@ function selectItemForOptions(id) {
       sugarGrid.className = "option-grid three"; 
     }
     
-    // Sinkronisasi status Ice Level di bagian akhir konfigurasi
     syncIceOptions();
   }
 
@@ -648,7 +635,6 @@ document.addEventListener("click", (event) => {
 
   const btnGPS = event.target.closest("#btnGPS");
   if (btnGPS) {
-    const txtAddress = document.querySelector("#modalCustomerAddress");
     const searchCityInput = document.querySelector("#searchCityInput");
     const gpsStatus = document.querySelector("#gpsStatus");
     const queryCity = searchCityInput.value.trim();
@@ -682,7 +668,17 @@ addConfiguredItemButton.addEventListener("click", () => {
 
 closeOrderModalButton.addEventListener("click", () => closeOrderModal());
 continueShoppingButton.addEventListener("click", () => closeOrderModal());
-goCheckoutButton.addEventListener("click", () => { if (getCartQuantity() >= 2) showCheckoutStage(); });
+
+// FIX: Memperbaiki aksi klik tombol "Selesai, Bayar QRIS"
+goCheckoutButton.addEventListener("click", () => { 
+  const totalQty = getCartQuantity();
+  if (totalQty >= 2) { 
+    setModalStage("checkout"); 
+  } else {
+    alert(`Pesanan baru ${totalQty} menu. Minimal pemesanan adalah 2 menu.`);
+  }
+});
+
 backToCartButton.addEventListener("click", () => setModalStage("cart"));
 openCartButton.addEventListener("click", () => { if (getCartQuantity() > 0) { openOrderModal(); setModalStage("cart"); } });
 
@@ -703,7 +699,9 @@ orderForm.addEventListener("submit", async (event) => {
     const links = buildWhatsappLinks(String(formData.get("adminPhone")).replace(/\D/g, ""), message);
     cart.clear(); orderForm.reset(); renderCart(); closeOrderModal();
     window.location.href = isAndroidDevice() ? links.appUrl : links.waMeUrl;
-  } catch (error) { alert("Error menyimpan order."); }
+  } catch (error) { 
+    alert("Error menyimpan order. Pastikan Supabase Anda terkonfigurasi dengan benar."); 
+  }
   finally { submitButton.disabled = false; }
 });
 
