@@ -22,7 +22,7 @@ const menuItems = [
   { id: "dua-shot-og-aren", group: "coffee", name: "Dua Shot OG Aren", oldPrice: 25000, price: 16500, largePrice: 23500, allowBeans: true, allowOatside: true, noSugar: true, color: "#d7a36c", foam: "#fff2dc", drizzle: "#76401f" },
   { id: "mocha-caramel", group: "coffee", name: "Mocha Caramel", oldPrice: 26000, price: 17000, largePrice: 24000, jumboPrice: 34000, allowBeans: true, allowOatside: true, noSugar: true, color: "#70402c", foam: "#f4dcc4", drizzle: "#3b1c12" },
   { id: "cafe-malt-latte", group: "coffee", name: "Cafe Malt Latte", oldPrice: 23000, price: 15500, largePrice: 22500, color: "#2f2922", foam: "#e2c696", drizzle: "#b17a37" },
-  { id: "kopi-kenangan-mantan", group: "coffee", name: "Kopi Kenangan Mantan", isBestSeller: true, oldPrice: 19000, price: 12500, largePrice: 18500, jumboPrice: 28500, allowBeans: true, allowOatside: true, color: "#8d4a27", foam: "#f3d3b1", drizzle: "#5d2d19" },
+  { id: "kopi-kenangan-mantan", group: "coffee", name: "Kopi Kenangan Mantan", soldOutUntil: "2026-05-28T17:00", isBestSeller: true, oldPrice: 19000, price: 12500, largePrice: 18500, jumboPrice: 28500, allowBeans: true, allowOatside: true, color: "#8d4a27", foam: "#f3d3b1", drizzle: "#5d2d19" },
   { id: "caramel-latte", group: "coffee", name: "Caramel Latte", oldPrice: 26000, price: 16000, largePrice: 24000, jumboPrice: 33000, allowBeans: true, allowOatside: true, color: "#b45b23", foam: "#fff0dc", drizzle: "#a04b19" },
   { id: "dua-shot-iced-shaken", group: "coffee", name: "Dua Shot Iced Shaken", oldPrice: 28000, price: 17000, largePrice: 27000, jumboPrice: 36000, allowBeans: true, allowOatside: true, noHot: true, color: "#d56419", foam: "#ffe4c6", drizzle: "#ee8d24" },
   { id: "caramel-macchiato", group: "coffee", name: "Caramel Macchiato", oldPrice: 28000, price: 17000, largePrice: 27000, jumboPrice: 36000, allowBeans: true, allowOatside: true, color: "#bd6a2d", foam: "#fff2dc", drizzle: "#a75a20" },
@@ -257,12 +257,40 @@ function menuVisual(item) {
 
 // Ganti fungsi menuCard lama dengan ini:
 function menuCard(item) {
-  return `<article class="menu-card ${item.isNew ? "new" : ""} ${item.isBestSeller ? "best-seller" : ""}">
+  // Mengecek apakah menu di-set habis manual atau menggunakan timer
+  let currentlySoldOut = item.isSoldOut === true;
+  let unlockMessage = "";
+
+  // Logika Timer Waktu
+  if (item.soldOutUntil) {
+    const unlockTime = new Date(item.soldOutUntil).getTime();
+    const now = new Date().getTime();
+    
+    // Jika waktu sekarang masih di bawah batas timer, matikan menu
+    if (now < unlockTime) {
+      currentlySoldOut = true;
+      // Membuat format jam untuk ditampilkan (Opsional)
+      const timeObj = new Date(unlockTime);
+      const jam = timeObj.getHours().toString().padStart(2, '0');
+      const menit = timeObj.getMinutes().toString().padStart(2, '0');
+      unlockMessage = `<span class="unlock-time">Buka jam ${jam}:${menit}</span>`;
+    }
+  }
+
+  const soldOutClass = currentlySoldOut ? "sold-out" : "";
+  const bestSellerClass = item.isBestSeller ? "best-seller" : "";
+  
+  const buttonHtml = currentlySoldOut 
+    ? `<button class="add-button" type="button" disabled>Habis</button>`
+    : `<button class="add-button" type="button" data-id="${item.id}">Tambah</button>`;
+
+  return `<article class="menu-card ${item.isNew ? "new" : ""} ${bestSellerClass} ${soldOutClass}">
     ${menuVisual(item)}
+    ${unlockMessage}
     <h3>${item.name}</h3>
     ${item.oldPrice ? `<span class="old-price">${rupiah.format(item.oldPrice)}</span>` : ""}
     <span class="price">${rupiah.format(item.price)}</span>
-    <button class="add-button" type="button" data-id="${item.id}">Tambah</button>
+    ${buttonHtml}
   </article>`;
 }
 

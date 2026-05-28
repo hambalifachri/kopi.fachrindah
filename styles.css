@@ -1744,3 +1744,35 @@ textarea:focus {
   white-space: nowrap;
   box-shadow: 0 4px 10px rgba(233, 132, 37, 0.4);
 }
+
+/* Efek Visual Untuk Menu Habis (Sold Out) */
+.menu-card.sold-out {
+  opacity: 0.55;
+  filter: grayscale(100%);
+  pointer-events: none; /* Mencegah gambar/area card merespon klik */
+}
+
+/* Tulisan HABIS melayang di tengah gambar */
+.menu-card.sold-out::after {
+  content: "HABIS";
+  position: absolute;
+  top: 35%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 6px 14px;
+  color: var(--white);
+  background: var(--dark);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 900;
+  z-index: 3;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 10px rgba(23, 11, 6, 0.4);
+}
+
+/* Mengubah warna tombol menjadi abu-abu */
+.menu-card.sold-out .add-button {
+  background: var(--muted);
+  color: #e2dcd9;
+  pointer-events: none;
+}
