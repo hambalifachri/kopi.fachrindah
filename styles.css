@@ -1915,3 +1915,192 @@ textarea:focus {
   transform: scale(0.95);
   box-shadow: 0 2px 8px rgba(37, 211, 102, 0.3);
 }
+
+/* ========================================= */
+/* TOMBOL & POP-UP INFO JASDOR               */
+/* ========================================= */
+.info-btn {
+  background: #fff;
+  border: 1px solid #d94b3d;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #d94b3d;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  transition: all 0.2s ease;
+}
+
+.info-btn:active {
+  background: #d94b3d;
+  color: #fff;
+}
+
+/* Mengatur isi Pop-up Info */
+.info-content {
+  max-width: 400px; /* Lebar pop-up */
+  text-align: left;
+  padding: 24px;
+}
+
+.info-section {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px dashed #eee;
+}
+
+.info-section h3 {
+  font-size: 1.05rem;
+  color: #d94b3d; /* Warna tema toko */
+  margin-bottom: 8px;
+}
+
+.info-section p, .info-section li {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #444;
+}
+
+.info-section ol {
+  padding-left: 20px;
+  margin: 0;
+}
+
+.info-section li {
+  margin-bottom: 6px;
+}
+
+/* ========================================= */
+/* BACKGROUND & POSISI POP-UP JASDOR         */
+/* ========================================= */
+#infoModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6); /* Background gelap transparan */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* Memastikan posisinya paling depan menutupi menu */
+}
+
+/* Class untuk menyembunyikan Pop-up */
+#infoModal.hidden {
+  display: none;
+}
+
+/* Desain Kotak Pop-up */
+.info-content {
+  background: #fff;
+  padding: 24px;
+  border-radius: 12px;
+  max-width: 90%;
+  width: 400px;
+  position: relative;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  animation: popUpAnim 0.3s ease-out;
+}
+
+/* Tombol Silang (Close) */
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.close-btn:hover {
+  color: #d94b3d;
+}
+
+/* Animasi Muncul */
+@keyframes popUpAnim {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ========================================= */
+/* TOMBOL INFO JASDOR & CARA ORDER (BARU)    */
+/* ========================================= */
+.info-action-cards {
+  display: flex;
+  gap: 12px;
+  margin: 24px 12px 18px;
+  justify-content: center;
+}
+
+.action-card {
+  flex: 1;
+  max-width: 220px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 2px solid var(--line);
+  border-radius: 16px;
+  cursor: pointer;
+  box-shadow: 0 6px 14px rgba(43, 23, 16, 0.06);
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.action-card:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 6px rgba(43, 23, 16, 0.04);
+}
+
+/* Warna Kartu Jasdor */
+.jasdor-card {
+  border-color: #f0cdbb;
+  background: #fff8f1;
+}
+
+/* Warna Kartu Cara Order */
+.order-card {
+  border-color: #dceada;
+  background: #f4fbf3;
+}
+
+.card-icon {
+  font-size: 1.8rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+.card-text {
+  display: grid;
+  gap: 2px;
+}
+
+.card-text strong {
+  color: var(--brown);
+  font-size: 0.92rem;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.card-text small {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+/* Responsif: Kalau layarnya terlalu sempit, kartunya jadi atas-bawah */
+@media (max-width: 400px) {
+  .info-action-cards {
+    flex-direction: column;
+    align-items: center;
+  }
+  .action-card {
+    width: 100%;
+    max-width: 100%;
+  }
+}

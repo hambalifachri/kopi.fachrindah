@@ -171,6 +171,24 @@
           </form>
         </section>
 
+<div class="info-action-cards">
+  <button id="btnJasdor" class="action-card jasdor-card">
+    <span class="card-icon">✨</span>
+    <div class="card-text">
+      <strong>Apa itu Jasdor?</strong>
+      <small>Info & Keuntungan</small>
+    </div>
+  </button>
+
+  <button id="btnCaraOrder" class="action-card order-card">
+    <span class="card-icon">📖</span>
+    <div class="card-text">
+      <strong>Cara Order</strong>
+      <small>Tutorial Praktis</small>
+    </div>
+  </button>
+</div>
+
         <div class="search-panel">
           <label for="menuSearch">Cari menu</label>
           <div class="search-row">
@@ -480,7 +498,34 @@
       </button>
       <button class="back-to-top" id="backToTop" type="button" aria-label="Kembali ke atas">↑</button>
     </main>
+<!-- KOTAK POP-UP JASDOR -->
+    <div id="infoModal" class="modal-overlay hidden">
+      <div class="modal-content info-content">
+        <button id="closeInfoBtn" class="close-btn">&times;</button>
+        
+        <h2 style="text-align: center; margin-bottom: 15px;">ℹ️ Pusat Informasi</h2>
+        
+        <div class="info-section">
+          <h3>Apa itu Jasdor?</h3>
+          <p>
+            <strong>Jasdor (Jasa Direct Order)</strong> adalah layanan pesan langsung dari kami. Lewat Jasdor, kamu bisa menikmati kopi dan menu favoritmu dengan harga spesial yang <strong>jauh lebih hemat</strong> dibandingkan harga normal di outlet. Jajan enak, kantong tetap aman!
+          </p>
+        </div>
 
+<div class="info-section">
+          <h3>Tutorial Cara Order</h3>
+          <ol>
+            <li>Pilih menu favoritmu, lalu klik tombol <strong>Tambah</strong>.</li>
+            <li>Untuk minuman, <strong>sesuaikan rasamu</strong> (pilihan es, gula, ukuran, dll). Untuk makanan & promo akan langsung masuk keranjang.</li>
+            <li>Klik <strong>tombol keranjang melayang</strong> di bagian bawah layar, periksa pesanan, lalu klik <strong>Selesai, Bayar QRIS</strong>.</li>
+            <li>Isi biodata pengiriman dan lakukan pembayaran dengan <strong>Scan QRIS</strong> yang tampil di layar.</li>
+            <li><strong>Upload bukti pembayaranmu</strong>, lalu klik tombol kirim. Detail pesanan otomatis diteruskan ke WhatsApp Admin!</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCRIPT (BIARKAN TETAP DI BAWAH) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     <script src="script.js"></script>

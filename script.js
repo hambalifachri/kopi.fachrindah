@@ -1020,3 +1020,75 @@ setInterval(() => {
     renderMenu(); // Hilangkan banner merah & normalkan tombol
   }
 }, 3000); // <-- Untuk testing biarkan 3000 (3 detik) dulu
+
+// ==========================================
+// FITUR POP-UP JASDOR & CARA ORDER (2 TOMBOL)
+// ==========================================
+document.addEventListener("DOMContentLoaded", () => {
+  // Ambil kedua ID tombol yang baru
+  const btnJasdor = document.getElementById('btnJasdor');
+  const btnCaraOrder = document.getElementById('btnCaraOrder');
+  
+  const infoModal = document.getElementById('infoModal');
+  const closeInfoBtn = document.getElementById('closeInfoBtn');
+
+  // Fungsi praktis untuk membuka modal
+  const openModal = () => {
+    if (infoModal) infoModal.classList.remove('hidden');
+  };
+
+  // Pasang sensor klik ke kedua tombol!
+  if (btnJasdor) btnJasdor.addEventListener('click', openModal);
+  if (btnCaraOrder) btnCaraOrder.addEventListener('click', openModal);
+
+  // Tombol silang untuk menutup
+  if (closeInfoBtn) {
+    closeInfoBtn.addEventListener('click', () => {
+      infoModal.classList.add('hidden');
+    });
+  }
+
+  // Menutup saat mengklik area gelap di luar kotak
+  if (infoModal) {
+    infoModal.addEventListener('click', (event) => {
+      if (event.target === infoModal) {
+        infoModal.classList.add('hidden');
+      }
+    });
+  }
+});// ==========================================
+// FITUR POP-UP JASDOR & CARA ORDER (2 TOMBOL)
+// ==========================================
+document.addEventListener("DOMContentLoaded", () => {
+  // Ambil kedua ID tombol yang baru
+  const btnJasdor = document.getElementById('btnJasdor');
+  const btnCaraOrder = document.getElementById('btnCaraOrder');
+  
+  const infoModal = document.getElementById('infoModal');
+  const closeInfoBtn = document.getElementById('closeInfoBtn');
+
+  // Fungsi praktis untuk membuka modal
+  const openModal = () => {
+    if (infoModal) infoModal.classList.remove('hidden');
+  };
+
+  // Pasang sensor klik ke kedua tombol!
+  if (btnJasdor) btnJasdor.addEventListener('click', openModal);
+  if (btnCaraOrder) btnCaraOrder.addEventListener('click', openModal);
+
+  // Tombol silang untuk menutup
+  if (closeInfoBtn) {
+    closeInfoBtn.addEventListener('click', () => {
+      infoModal.classList.add('hidden');
+    });
+  }
+
+  // Menutup saat mengklik area gelap di luar kotak
+  if (infoModal) {
+    infoModal.addEventListener('click', (event) => {
+      if (event.target === infoModal) {
+        infoModal.classList.add('hidden');
+      }
+    });
+  }
+});
