@@ -1858,3 +1858,60 @@ textarea:focus {
   color: var(--red);
   font-weight: 900;
 }
+
+
+/* ========================================= */
+/* BANNER TOKO TUTUP SEMENTARA               */
+/* ========================================= */
+.store-closed-banner {
+  flex: 0 0 100%;
+  margin-bottom: 12px;
+  padding: 16px;
+  background: #ffebe9;
+  border: 2px dashed #d94b3d;
+  border-radius: 12px;
+  text-align: center;
+  color: #9c261f;
+  animation: pulseWarning 2s infinite;
+}
+
+.store-closed-banner strong {
+  font-size: 1.1rem;
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 900;
+}
+
+.store-closed-banner p {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+@keyframes pulseWarning {
+  0% { box-shadow: 0 0 0 0 rgba(217, 75, 61, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(217, 75, 61, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(217, 75, 61, 0); }
+}
+
+/* ========================================= */
+/* TOMBOL WA DIRECT SAAT TOKO TUTUP          */
+/* ========================================= */
+.wa-direct-btn {
+  display: inline-block;
+  padding: 10px 24px;
+  background: #25D366; /* Warna hijau khas WhatsApp */
+  color: #ffffff !important;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 0.9rem;
+  text-decoration: none;
+  box-shadow: 0 6px 16px rgba(37, 211, 102, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.wa-direct-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 8px rgba(37, 211, 102, 0.3);
+}

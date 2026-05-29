@@ -1,3 +1,40 @@
+// ==========================================
+// PENGATURAN STATUS TOKO (BUKA / TUTUP)
+// ==========================================
+const storeConfig = {
+  isManualClosed: false, // Ubah tulisan 'false' menjadi 'true' jika kamu mau tutup toko mendadak.
+  manualClosedMessage: "Maaf, saat ini toko sedang tutup sementara. Silakan kembali lagi nanti.",
+  
+  // Fitur Tutup Otomatis setiap Jumat (Jam 12:00 - 12:59)
+  autoJumatan: true 
+};
+
+function checkStoreStatus() {
+  // MENGUNCI WAKTU KE WIB (JAKARTA)
+  // Jadi walaupun jam HP pelanggan error, toko tetap ikut waktu WIB yang asli
+  const waktuJakarta = new Date().toLocaleString("en-US", {timeZone: "Asia/Jakarta"});
+  const now = new Date(waktuJakarta);
+
+  const day = now.getDay(); // 0 = Minggu, 5 = Jumat
+  const hour = now.getHours(); // Format 24 jam
+  
+  // Link WA otomatis jika pelanggan butuh chat mendadak
+  const waLink = "https://wa.me/6281281400462?text=Halo%20admin%20kopi.fachrindah,%20saya%20mau%20tanya-tanya%20dulu%20dong.";
+  const waButtonHtml = `<br><br><a href="${waLink}" target="_blank" class="wa-direct-btn">Chat WhatsApp Admin</a>`;
+
+  // 1. Cek apakah admin menutup manual
+  if (storeConfig.isManualClosed) {
+    return { closed: true, message: "Maaf, saat ini toko sedang tutup sementara. Jika ada kebutuhan mendesak, silakan langsung hubungi kami via WhatsApp ya." + waButtonHtml };
+  }
+
+  // 2. Cek apakah sedang jam Sholat Jumat (Hari 5, Jam 12)
+  if (storeConfig.autoJumatan && day === 5 && hour === 12) {
+    return { closed: true, message: "Maaf, toko sedang istirahat untuk ibadah Sholat Jumat dan akan buka kembali otomatis pukul 13:00 WIB.<br><br>Punya pertanyaan atau mau titip pesanan? Langsung chat admin aja ya." + waButtonHtml };
+  }
+
+  return { closed: false };
+}
+
 const categories = [
   { id: "promo-50k", title: "Promo 50K" },
   { id: "promo-60k", title: "Promo 60K" },
@@ -394,19 +431,20 @@ function menuVisual(item) {
 
 // Ganti fungsi menuCard lama dengan ini:
 function menuCard(item) {
-  // Mengecek apakah menu di-set habis manual atau menggunakan timer
-  let currentlySoldOut = item.isSoldOut === true;
+  const store = checkStoreStatus();
+  
+  // Kalau toko tutup, paksa semua menu jadi statusnya habis/mati
+  let currentlySoldOut = item.isSoldOut === true || store.closed;
   let unlockMessage = "";
 
-  // Logika Timer Waktu
-  if (item.soldOutUntil) {
+  // Tampilkan pesan di atas gambar
+  if (store.closed) {
+    unlockMessage = `<span class="unlock-time">TOKO TUTUP</span>`;
+  } else if (item.soldOutUntil) {
     const unlockTime = new Date(item.soldOutUntil).getTime();
     const now = new Date().getTime();
-    
-    // Jika waktu sekarang masih di bawah batas timer, matikan menu
     if (now < unlockTime) {
       currentlySoldOut = true;
-      // Membuat format jam untuk ditampilkan (Opsional)
       const timeObj = new Date(unlockTime);
       const jam = timeObj.getHours().toString().padStart(2, '0');
       const menit = timeObj.getMinutes().toString().padStart(2, '0');
@@ -417,8 +455,10 @@ function menuCard(item) {
   const soldOutClass = currentlySoldOut ? "sold-out" : "";
   const bestSellerClass = item.isBestSeller ? "best-seller" : "";
   
+  // Ganti teks tombol jika sedang tutup
+  const buttonText = store.closed ? "Tutup" : (currentlySoldOut ? "Habis" : "Tambah");
   const buttonHtml = currentlySoldOut 
-    ? `<button class="add-button" type="button" disabled>Habis</button>`
+    ? `<button class="add-button" type="button" disabled>${buttonText}</button>`
     : `<button class="add-button" type="button" data-id="${item.id}">Tambah</button>`;
 
   return `<article class="menu-card ${item.isNew ? "new" : ""} ${bestSellerClass} ${soldOutClass}">
@@ -432,7 +472,8 @@ function menuCard(item) {
 }
 
 function normalizeText(value) { return String(value).toLowerCase().trim(); }
-
+  const store = checkStoreStatus();
+  const bannerHtml = store.closed ? `<div class="store-closed-banner"><strong>⚠️ TOKO SEDANG TUTUP</strong><p>${store.message}</p></div>` : "";
 function renderMenu(query = "") {
   const normalizedQuery = normalizeText(query);
   
@@ -896,13 +937,21 @@ continueShoppingButton.addEventListener("click", () => closeOrderModal());
 
 // FIX: Memperbaiki aksi klik tombol "Selesai, Bayar QRIS"
 // FIX: Memperbaiki aksi klik tombol "Selesai, Bayar QRIS" dengan pengecualian Bundling
+// GEMBOK REAL-TIME: Memperbaiki aksi klik tombol "Selesai, Bayar QRIS" saat testing lokal
 goCheckoutButton.addEventListener("click", () => { 
-  const totalQty = getCartQuantity();
+  // 1. Ambil status toko detik ini juga saat tombol diklik
+  const store = checkStoreStatus();
   
-  // Mengecek apakah di dalam keranjang ada item yang grupnya mengandung kata "promo"
+  // 2. Jika toko terdeteksi tutup, langsung block di sini!
+  if (store.closed) {
+    alert("Maaf, saat ini toko sedang tutup / istirahat untuk Sholat Jumat. Silakan kembali lagi nanti atau hubungi WhatsApp admin (081281400462).");
+    return; // Mencegah masuk ke tahap checkout biodata
+  }
+
+  // 3. Jika toko buka, jalankan aturan minimal order seperti biasa
+  const totalQty = getCartQuantity();
   const hasBundling = [...cart.values()].some(item => item.group && item.group.includes("promo"));
 
-  // Izinkan checkout jika jumlah >= 2 ATAU ada menu bundling di keranjang
   if (totalQty >= 2 || hasBundling) { 
     setModalStage("checkout"); 
   } else {
@@ -947,3 +996,27 @@ backToTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "s
 
 renderMenu();
 renderCart();
+
+// ==========================================
+// SATPAM KELILING (BACKGROUND CHECKER) Cerdas
+// ==========================================
+// Memori ingatan satpam saat website pertama kali dibuka
+let statusTokoSebelumnya = checkStoreStatus().closed; 
+
+setInterval(() => {
+  const store = checkStoreStatus();
+  
+  // SKENARIO 1: Toko harusnya TUTUP, tapi di ingatan satpam masih BUKA
+  if (store.closed && statusTokoSebelumnya === false) {
+    statusTokoSebelumnya = true; // Update ingatan satpam jadi "Tutup"
+    alert("Waktu ibadah Sholat Jumat telah tiba. Toko ditutup sementara hingga pukul 13:00 WIB.");
+    renderMenu(); // Tampilkan banner merah & kunci tombol
+  } 
+  
+  // SKENARIO 2: Toko harusnya BUKA (Jam 13:00), tapi di ingatan satpam masih TUTUP
+  else if (!store.closed && statusTokoSebelumnya === true) {
+    statusTokoSebelumnya = false; // Update ingatan satpam jadi "Buka"
+    alert("Toko sudah buka kembali! Silakan melanjutkan pesanan kamu.");
+    renderMenu(); // Hilangkan banner merah & normalkan tombol
+  }
+}, 3000); // <-- Untuk testing biarkan 3000 (3 detik) dulu
