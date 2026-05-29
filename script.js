@@ -2,7 +2,7 @@
 // PENGATURAN STATUS TOKO (BUKA / TUTUP)
 // ==========================================
 const storeConfig = {
-  isManualClosed: false, // Ubah tulisan 'false' menjadi 'true' jika kamu mau tutup toko mendadak.
+  isManualClosed: true, // Ubah tulisan 'false' menjadi 'true' jika kamu mau tutup toko mendadak.
   manualClosedMessage: "Maaf, saat ini toko sedang tutup sementara. Silakan kembali lagi nanti.",
   
   // Fitur Tutup Otomatis setiap Jumat (Jam 12:00 - 12:59)
