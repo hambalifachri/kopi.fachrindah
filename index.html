@@ -120,39 +120,43 @@
               <textarea id="reviewText" name="reviewText" rows="3" placeholder="Tulis pengalaman order kamu" required></textarea>
             </label>
             <button class="review-button" type="submit">Tampilkan Review di Website</button>
-          </form>
-        </section>
+</form>
+      </section>
 
-        <!-- TOMBOL INSTALL APLIKASI (Hanya muncul jika belum diinstall) -->
-  <div id="installAppContainer" style="...">
-          <button id="btnInstallApp" class="install-btn">
-            📲 Install Aplikasi Kopi Fachrindah
-          </button>
-        </div>
+      <!-- ========================================== -->
+      <!-- AREA TOMBOL (PASTIKAN COPY SEMUA BAGIAN INI) -->
+      <!-- ========================================== -->
+      
+      <!-- 1. Tombol Install Aplikasi PWA -->
+      <div id="installAppContainer" class="hidden" style="text-align: center; margin: 5px 12px 15px;">
+        <button id="btnInstallApp" class="install-btn">
+          📲 Install Aplikasi Kopi Fachrindah
+        </button>
+      </div>
 
-        <!-- TOMBOL PUSAT INFORMASI (VERSI KARTU) YANG SUDAH ADA -->
-        <div class="info-action-cards">
+      <!-- 2. Kartu Tombol Jasdor & Cara Order -->
+      <div class="info-action-cards">
+        <button id="btnJasdor" class="action-card jasdor-card">
+          <span class="card-icon">✨</span>
+          <div class="card-text">
+            <strong>Apa itu Jasdor?</strong>
+            <small>Info & Keuntungan</small>
+          </div>
+        </button>
 
-<div class="info-action-cards">
-  <button id="btnJasdor" class="action-card jasdor-card">
-    <span class="card-icon">✨</span>
-    <div class="card-text">
-      <strong>Apa itu Jasdor?</strong>
-      <small>Info & Keuntungan</small>
-    </div>
-  </button>
+        <button id="btnCaraOrder" class="action-card order-card">
+          <span class="card-icon">📖</span>
+          <div class="card-text">
+            <strong>Cara Order</strong>
+            <small>Tutorial Praktis</small>
+          </div>
+        </button>
+      </div> <!-- <== INI DIA TAG PENUTUP YANG HILANG SEBELUMNYA! -->
 
-  <button id="btnCaraOrder" class="action-card order-card">
-    <span class="card-icon">📖</span>
-    <div class="card-text">
-      <strong>Cara Order</strong>
-      <small>Tutorial Praktis</small>
-    </div>
-  </button>
-</div>
+      <!-- ========================================== -->
 
-        <div class="search-panel">
-          <label for="menuSearch">Cari menu</label>
+      <div class="search-panel">
+        <label for="menuSearch">Cari menu</label>
           <div class="search-row">
             <input id="menuSearch" type="search" placeholder="Contoh: latte, thai tea, croissant" autocomplete="off" />
             <button id="clearSearch" type="button" aria-label="Hapus pencarian">×</button>
