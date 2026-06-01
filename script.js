@@ -12,8 +12,7 @@ const storeConfig = {
 function checkStoreStatus() {
   // MENGUNCI WAKTU KE WIB (JAKARTA)
   // Jadi walaupun jam HP pelanggan error, toko tetap ikut waktu WIB yang asli
-  const waktuJakarta = new Date().toLocaleString("en-US", {timeZone: "Asia/Jakarta"});
-  const now = new Date(waktuJakarta);
+  const now = getJakartaDate();
 
   const day = now.getDay(); // 0 = Minggu, 5 = Jumat
   const hour = now.getHours(); // Format 24 jam
@@ -33,6 +32,43 @@ function checkStoreStatus() {
   }
 
   return { closed: false };
+}
+
+function getJakartaDate() {
+  const waktuJakarta = new Date().toLocaleString("en-US", { timeZone: "Asia/Jakarta" });
+  return new Date(waktuJakarta);
+}
+
+function timeToMinutes(time) {
+  const [hour, minute] = String(time).split(":").map(Number);
+  return hour * 60 + minute;
+}
+
+function isScheduleActive(schedule, now = getJakartaDate()) {
+  const day = now.getDay();
+  if (schedule.days && !schedule.days.includes(day)) return false;
+
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const startMinutes = timeToMinutes(schedule.start);
+  const endMinutes = timeToMinutes(schedule.end);
+
+  if (startMinutes <= endMinutes) {
+    return currentMinutes >= startMinutes && currentMinutes < endMinutes;
+  }
+
+  return currentMinutes >= startMinutes || currentMinutes < endMinutes;
+}
+
+function getActiveSizeBlock(item, size, now = getJakartaDate()) {
+  if (!item.sizeBlocks) return null;
+  return item.sizeBlocks.find((block) => block.size === size && isScheduleActive(block, now)) || null;
+}
+
+function getActiveSizeBlockNotes(item, now = getJakartaDate()) {
+  if (!item.sizeBlocks) return [];
+  return item.sizeBlocks
+    .filter((block) => isScheduleActive(block, now))
+    .map((block) => `${block.size} tidak tersedia ${block.label || ""}`.trim());
 }
 
 const categories = [
@@ -185,7 +221,7 @@ const menuItems = [
   { id: "dua-shot-og-aren", group: "coffee", name: "Dua Shot OG Aren", oldPrice: 25000, price: 16500, largePrice: 23500, allowBeans: true, allowOatside: true, noSugar: true, color: "#d7a36c", foam: "#fff2dc", drizzle: "#76401f" },
   { id: "mocha-caramel", group: "coffee", name: "Mocha Caramel", oldPrice: 26000, price: 17000, largePrice: 24000, jumboPrice: 34000, allowBeans: true, allowOatside: true, noSugar: true, color: "#70402c", foam: "#f4dcc4", drizzle: "#3b1c12" },
   { id: "cafe-malt-latte", group: "coffee", name: "Cafe Malt Latte", oldPrice: 23000, price: 15500, largePrice: 22500, color: "#2f2922", foam: "#e2c696", drizzle: "#b17a37" },
-  { id: "kopi-kenangan-mantan", group: "coffee", name: "Kopi Kenangan Mantan", soldOutUntil: "2026-05-28T17:00", isBestSeller: true, oldPrice: 19000, price: 12500, jumboPrice: 28500, allowBeans: true, allowOatside: true, color: "#8d4a27", foam: "#f3d3b1", drizzle: "#5d2d19" },
+  { id: "kopi-kenangan-mantan", group: "coffee", name: "Kopi Kenangan Mantan", isBestSeller: true, oldPrice: 19000, price: 12500, largePrice: 18500, jumboPrice: 28500, allowBeans: true, allowOatside: true, sizeBlocks: [{ size: "Large", start: "13:00", end: "15:00", label: "jam 13.00-15.00" }], color: "#8d4a27", foam: "#f3d3b1", drizzle: "#5d2d19" },
   { id: "caramel-latte", group: "coffee", name: "Caramel Latte", oldPrice: 26000, price: 16000, largePrice: 24000, jumboPrice: 33000, allowBeans: true, allowOatside: true, color: "#b45b23", foam: "#fff0dc", drizzle: "#a04b19" },
   { id: "dua-shot-iced-shaken", group: "coffee", name: "Dua Shot Iced Shaken", oldPrice: 28000, price: 17000, largePrice: 27000, jumboPrice: 36000, allowBeans: true, allowOatside: true, noHot: true, color: "#d56419", foam: "#ffe4c6", drizzle: "#ee8d24" },
   { id: "caramel-macchiato", group: "coffee", name: "Caramel Macchiato", oldPrice: 28000, price: 17000, largePrice: 27000, jumboPrice: 36000, allowBeans: true, allowOatside: true, color: "#bd6a2d", foam: "#fff2dc", drizzle: "#a75a20" },
@@ -386,8 +422,9 @@ const grandTotalEl = document.querySelector("#modalGrandTotal");
 const checkoutSummary = document.querySelector("#checkoutSummary");
 const clearCartButton = document.querySelector("#modalClearCart");
 const orderForm = document.querySelector("#modalOrderForm");
-const reviewForm = document.querySelector("#modalReviewForm");
+const reviewForm = document.querySelector("#reviewForm");
 const reviewsGrid = document.querySelector("#reviewsGrid");
+const testimonialGallery = document.querySelector("#testimonialGallery");
 const backToTop = document.querySelector("#backToTop");
 const openCartButton = document.querySelector("#openCartButton");
 const openCartCount = document.querySelector("#openCartCount");
@@ -408,6 +445,8 @@ const shareProofButton = document.querySelector("#shareProofButton");
 const optionGroups = document.querySelectorAll("[data-option-group]");
 const selectedDrink = document.querySelector("#selectedDrink");
 const addConfiguredItemButton = document.querySelector("#addConfiguredItem");
+
+const fallbackTestimonialImages = Array.from({ length: 52 }, (_, index) => `assets/ss-wa-${index + 2}.jpg`);
 
 function menuVisual(item) {
   // KHUSUS UNTUK MENU BUNDLE (KOLASE FOTO)
@@ -454,6 +493,8 @@ function menuCard(item) {
 
   const soldOutClass = currentlySoldOut ? "sold-out" : "";
   const bestSellerClass = item.isBestSeller ? "best-seller" : "";
+  const sizeBlockNotes = getActiveSizeBlockNotes(item);
+  const sizeBlockHtml = sizeBlockNotes.length ? `<span class="sale-note">${sizeBlockNotes.join(" · ")}</span>` : "";
   
   // Ganti teks tombol jika sedang tutup
   const buttonText = store.closed ? "Tutup" : (currentlySoldOut ? "Habis" : "Tambah");
@@ -467,21 +508,23 @@ function menuCard(item) {
     <h3>${item.name}</h3>
     ${item.oldPrice ? `<span class="old-price">${rupiah.format(item.oldPrice)}</span>` : ""}
     <span class="price">${rupiah.format(item.price)}</span>
+    ${sizeBlockHtml}
     ${buttonHtml}
   </article>`;
 }
 
 function normalizeText(value) { return String(value).toLowerCase().trim(); }
-  const store = checkStoreStatus();
-  const bannerHtml = store.closed ? `<div class="store-closed-banner"><strong>⚠️ TOKO SEDANG TUTUP</strong><p>${store.message}</p></div>` : "";
+
 function renderMenu(query = "") {
+  const store = checkStoreStatus();
+  const bannerHtml = store.closed ? `<div class="store-closed-banner"><strong>TOKO SEDANG TUTUP</strong><p>${store.message}</p></div>` : "";
   const normalizedQuery = normalizeText(query);
   
   // 1. Tambahkan menu "Best Seller" di awal navigasi kategori
   categoryNav.innerHTML = `<a href="#best-seller">🔥 Best Seller</a>` + 
                           categories.map((category) => `<a href="#${category.id}">${category.title}</a>`).join("");
 
-  let htmlOutput = "";
+  let htmlOutput = bannerHtml;
   let foundItems = new Set(); // Pakai Set agar menu yang muncul 2 kali tidak dihitung dobel saat dicari
 
   // 2. Buat bagian khusus Best Seller di paling atas
@@ -677,9 +720,12 @@ function setModalStage(stage) {
 function calculateItemPrice(item, options) {
   let price = item.price;
   if (!isFoodItem(item)) {
-    if (options.size === "Large" && item.largePrice) {
+    const activeLargeBlock = getActiveSizeBlock(item, "Large");
+    const activeJumboBlock = getActiveSizeBlock(item, "Jumbo");
+
+    if (options.size === "Large" && item.largePrice && !activeLargeBlock) {
       price = item.largePrice;
-    } else if (options.size === "Jumbo" && item.jumboPrice) {
+    } else if (options.size === "Jumbo" && item.jumboPrice && !activeJumboBlock) {
       price = item.jumboPrice;
     } else if (options.size === "Regular" && item.price) {
       price = item.price;
@@ -741,6 +787,9 @@ function selectItemForOptions(id) {
   const tempGrid = document.querySelector('[data-option-group="temperature"] .option-grid');
 
   if (!isFood) {
+    const hasActiveLargeBlock = Boolean(getActiveSizeBlock(item, "Large"));
+    const hasActiveJumboBlock = Boolean(getActiveSizeBlock(item, "Jumbo"));
+
     if (item.noHot && optHotBtn && tempGrid) {
       optHotBtn.style.display = "none";
       tempGrid.className = "option-grid one"; 
@@ -752,21 +801,30 @@ function selectItemForOptions(id) {
 
     if (item.noRegular) {
       if (optRegularBtn) optRegularBtn.style.display = "none";
-      selectedOptions.size = "Large"; 
-      document.querySelectorAll('[data-option-group="size"] .option-card').forEach(btn => btn.classList.remove('selected'));
-      if (optLargeBtn) optLargeBtn.classList.add('selected');
+      selectedOptions.size = "Large";
     } else {
       if (optRegularBtn) optRegularBtn.style.display = "block";
     }
 
-    if (item.largePrice) { optLargeBtn.style.display = "block"; } else { optLargeBtn.style.display = "none"; }
-    if (item.jumboPrice) { optJumboBtn.style.display = "block"; } else { optJumboBtn.style.display = "none"; }
+    if (item.largePrice && !hasActiveLargeBlock) { optLargeBtn.style.display = "block"; } else { optLargeBtn.style.display = "none"; }
+    if (item.jumboPrice && !hasActiveJumboBlock) { optJumboBtn.style.display = "block"; } else { optJumboBtn.style.display = "none"; }
 
-    if (!item.largePrice && !item.jumboPrice) {
+    if ((!item.largePrice || hasActiveLargeBlock) && (!item.jumboPrice || hasActiveJumboBlock)) {
       document.querySelector("#groupSize").style.display = "none";
     } else {
       document.querySelector("#groupSize").style.display = "block";
     }
+
+    const availableSizes = [];
+    if (!item.noRegular) availableSizes.push("Regular");
+    if (item.largePrice && !hasActiveLargeBlock) availableSizes.push("Large");
+    if (item.jumboPrice && !hasActiveJumboBlock) availableSizes.push("Jumbo");
+    if (!availableSizes.includes(selectedOptions.size)) {
+      selectedOptions.size = availableSizes[0] || "Regular";
+    }
+    document.querySelectorAll('[data-option-group="size"] .option-card').forEach((btn) => {
+      btn.classList.toggle("selected", btn.dataset.optionValue === selectedOptions.size);
+    });
 
     if (item.allowBeans) {
       document.querySelector("#groupBeans").style.display = "block";
@@ -816,9 +874,11 @@ function addItem(id) {
   if (!isFoodItem(item)) {
     if (!item.allowBeans) delete options.beans;
     if (!item.allowOatside) delete options.milk;
+    if (options.size === "Large" && (!item.largePrice || getActiveSizeBlock(item, "Large"))) options.size = "Regular";
+    if (options.size === "Jumbo" && (!item.jumboPrice || getActiveSizeBlock(item, "Jumbo"))) options.size = "Regular";
     
     // Opsional: Hapus teks "Regular" jika menu tidak punya pilihan Large/Jumbo
-    if (!item.largePrice && !item.jumboPrice) delete options.size;
+    if ((!item.largePrice || getActiveSizeBlock(item, "Large")) && (!item.jumboPrice || getActiveSizeBlock(item, "Jumbo"))) delete options.size;
   }
 
   const calculatedPrice = calculateItemPrice(item, options);
@@ -850,7 +910,7 @@ function buildWhatsappMessage(formData, savedOrder) {
   const subtotal = entries.reduce((total, item) => total + item.price * item.qty, 0);
   const orderLines = entries.map(item => `- ${item.name} x${item.qty} (${formatOptions(item.options)}) = ${rupiah.format(item.price * item.qty)}`).join("\n");
 
-  return ["Halo admin kopi.fachrindah, saya mau order jasdor.", `ID Order: ${savedOrder.id}`, `Nama: ${formData.get("customerName")}`, `WhatsApp: ${formData.get("customerPhone")}`, `Lokasi outlet: ${formData.get("customerAddress")}`, "", "Pesanan:", orderLines, "", `Total bayar: ${rupiah.format(subtotal)}`, `Link bukti transfer: ${savedOrder.proof.url}`, `Catatan: ${formData.get("orderNote") || "-"}`].join("\n");
+  return ["Halo admin kopi.fachrindah, saya mau order jasdor.", `ID Order: ${savedOrder.id}`, `Nama: ${formData.get("customerName")}`, `WhatsApp: ${formData.get("customerPhone")}`, `Lokasi outlet: ${formData.get("customerAddress")}`, "", "Pesanan:", orderLines, "", `Total bayar sementara: ${rupiah.format(subtotal)}`, "Catatan harga: jika harga outlet berbeda, mohon konfirmasi selisihnya dulu sebelum pesanan diproses.", `Link bukti transfer: ${savedOrder.proof.url}`, `Catatan customer: ${formData.get("orderNote") || "-"}`].join("\n");
 }
 
 function buildWhatsappLinks(adminPhone, encodedMessage) {
@@ -875,6 +935,19 @@ function renderSavedReview(review) {
   const article = document.createElement("article");
   article.innerHTML = `<div class="stars">${starsFromRating(review.rating)}</div><p>"${review.text}"</p><strong>${review.name}</strong>`;
   reviewsGrid.prepend(article);
+}
+
+function renderTestimonials() {
+  if (!testimonialGallery) return;
+  const images = Array.isArray(window.TESTIMONIAL_IMAGES) && window.TESTIMONIAL_IMAGES.length
+    ? window.TESTIMONIAL_IMAGES
+    : fallbackTestimonialImages;
+
+  testimonialGallery.dataset.source = images === fallbackTestimonialImages ? "fallback" : "manifest";
+  testimonialGallery.dataset.count = String(images.length);
+  testimonialGallery.innerHTML = images.map((src, index) => (
+    `<img src="${src}" alt="Testimoni WhatsApp ${index + 1}" loading="lazy" />`
+  )).join("");
 }
 
 optionGroups.forEach((group) => {
@@ -985,15 +1058,18 @@ orderForm.addEventListener("submit", async (event) => {
   finally { submitButton.disabled = false; }
 });
 
-reviewForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  const formData = new FormData(reviewForm);
-  renderSavedReview({ name: formData.get("reviewName"), rating: formData.get("reviewRating"), text: formData.get("reviewText") });
-  reviewForm.reset();
-});
+if (reviewForm) {
+  reviewForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const formData = new FormData(reviewForm);
+    renderSavedReview({ name: formData.get("reviewName"), rating: formData.get("reviewRating"), text: formData.get("reviewText") });
+    reviewForm.reset();
+  });
+}
 
 backToTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
 
+renderTestimonials();
 renderMenu();
 renderCart();
 

@@ -26,6 +26,22 @@ Ganti `6281281400462` dengan nomor admin milikmu. Pakai format Indonesia tanpa t
 
 Data menu ada di `script.js`, bagian `categories` dan `menuItems`. Kategori yang dipakai sekarang mengikuti screenshot: Promo & Combo, Baru!, Coffee, Non Coffee, Kenangan Frappe, Chef Martin Praja's Signature Bake, Kenangan Toast, dan Food.
 
+### Nonaktifkan Size Berdasarkan Jam
+
+Untuk menu yang size tertentu tidak bisa dijual di jam tertentu, pakai field `sizeBlocks` pada menu terkait. Contoh saat ini ada di Kopi Kenangan Mantan: size Large otomatis hilang jam 13:00-15:00 WIB.
+
+```js
+sizeBlocks: [
+  { size: "Large", start: "13:00", end: "15:00", label: "jam 13.00-15.00" }
+]
+```
+
+Di luar jam tersebut, size Large kembali muncul memakai harga normal.
+
+### Harga Beda Tiap Outlet
+
+Harga di website diperlakukan sebagai total sementara. Pesan WhatsApp order sudah menambahkan catatan agar admin mengonfirmasi dulu kalau harga outlet berbeda sebelum pesanan diproses.
+
 ## Foto Menu
 
 Foto produk disimpan di `assets/menu`. Mapping foto ke produk ada di `script.js`, bagian `productImages`.
@@ -64,3 +80,22 @@ Catatan: policy di `supabase-schema.sql` tidak membuka public read untuk tabel o
 ## Review
 
 Review ditampilkan sebagai testimoni di halaman utama, tapi customer tidak wajib mengisi review saat order. Ganti isi review placeholder di `index.html` kalau sudah punya review asli.
+
+Screenshot WhatsApp sekarang dibaca dari `gallery-images.js`, jadi nama file tidak perlu diseragamkan.
+
+Cara paling mudah:
+
+1. Klik dua kali `Buka Admin Testimoni.bat`.
+2. Pilih atau drag screenshot WhatsApp ke halaman admin.
+3. Klik `Upload ke Website`.
+4. Refresh halaman website.
+
+File akan disimpan otomatis ke `assets/testimoni` dan `gallery-images.js` diperbarui sendiri.
+
+Cara manual tetap bisa: taruh screenshot baru di `assets/New folder` atau `assets/testimoni`, lalu jalankan:
+
+```bash
+node tools/update-testimonials.js
+```
+
+File manifest akan diperbarui otomatis. Nama seperti `WhatsApp Image 2026-06-05 at 12.30.00.jpeg` tetap bisa dipakai.

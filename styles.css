@@ -688,6 +688,15 @@ button {
   font-weight: 900;
 }
 
+.sale-note {
+  display: block;
+  margin: 6px 0 2px;
+  color: var(--red);
+  font-size: 0.78rem;
+  font-weight: 900;
+  line-height: 1.25;
+}
+
 .add-button {
   width: 100%;
   min-height: 28px;
