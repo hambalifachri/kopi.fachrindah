@@ -1168,3 +1168,18 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
+// ==========================================
+// REGISTRASI SERVICE WORKER (MESIN PWA)
+// ==========================================
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(registration => {
+        console.log('Mesin PWA berhasil jalan!', registration.scope);
+      })
+      .catch(error => {
+        console.log('Mesin PWA gagal:', error);
+      });
+  });
+}
