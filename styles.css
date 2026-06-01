@@ -2113,3 +2113,30 @@ textarea:focus {
     max-width: 100%;
   }
 }
+
+/* ========================================= */
+/* TOMBOL INSTALL APLIKASI PWA               */
+/* ========================================= */
+#installAppContainer.hidden {
+  display: none;
+}
+
+.install-btn {
+  width: 100%;
+  max-width: 450px;
+  background: linear-gradient(135deg, #d94b3d, #9c261f);
+  color: var(--white);
+  border: none;
+  padding: 12px 20px;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 0.9rem;
+  box-shadow: 0 6px 15px rgba(156, 38, 31, 0.3);
+  animation: bounceInstall 2s infinite;
+}
+
+@keyframes bounceInstall {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-4px); }
+  60% { transform: translateY(-2px); }
+}

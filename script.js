@@ -1183,3 +1183,40 @@ if ('serviceWorker' in navigator) {
       });
   });
 }
+
+// ==========================================
+// MUNCULKAN TOMBOL INSTALL APLIKASI (PWA)
+// ==========================================
+let deferredPrompt;
+const installAppContainer = document.getElementById('installAppContainer');
+const btnInstallApp = document.getElementById('btnInstallApp');
+
+// Menangkap sinyal dari browser HP bahwa web ini bisa diinstall
+window.addEventListener('beforeinstallprompt', (e) => {
+  // Cegah browser memunculkan mini-infobar default (opsional tapi disarankan)
+  e.preventDefault();
+  // Simpan sinyalnya ke dalam variabel
+  deferredPrompt = e;
+  // Munculkan tombol Install buatan kita
+  if (installAppContainer) {
+    installAppContainer.classList.remove('hidden');
+  }
+});
+
+// Aksi saat tombol Install diklik
+if (btnInstallApp) {
+  btnInstallApp.addEventListener('click', async () => {
+    // Sembunyikan tombol setelah diklik
+    installAppContainer.classList.add('hidden');
+    
+    if (deferredPrompt) {
+      // Munculkan pop-up install bawaan HP!
+      deferredPrompt.prompt();
+      // Tunggu respon pengguna (apakah klik Install atau Cancel)
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log(`Pilihan user: ${outcome}`);
+      // Kosongkan variabel karena sinyal hanya bisa dipakai sekali
+      deferredPrompt = null;
+    }
+  });
+}
