@@ -1025,7 +1025,7 @@ goCheckoutButton.addEventListener("click", () => {
   const totalQty = getCartQuantity();
   const hasBundling = [...cart.values()].some(item => item.group && item.group.includes("promo"));
 
-  if (totalQty >= 3 || hasBundling) { 
+  if (totalQty >= 2 || hasBundling) { 
     setModalStage("checkout"); 
   } else {
     alert(`Pesanan kamu baru ${totalQty} menu. Minimal pemesanan adalah 2 menu satuan (Kecuali untuk pembelian Paket Promo / Bundling).`);
