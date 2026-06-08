@@ -79,6 +79,7 @@ function isTestimonialImage(filePath) {
   const baseName = path.basename(filePath).toLowerCase();
   if (!imageExtensions.has(ext)) return false;
   if (baseName.includes("qris")) return false;
+  if (baseName.startsWith("icon-")) return false;
   return true;
 }
 
@@ -99,11 +100,7 @@ async function listImagesIn(folder) {
 }
 
 async function updateGalleryManifest() {
-  const folders = [
-    path.join(root, "assets"),
-    path.join(root, "assets", "New folder"),
-    uploadDir,
-  ];
+  const folders = [path.join(root, "assets"), uploadDir];
   const imagePaths = (await Promise.all(folders.map(listImagesIn))).flat();
   imagePaths.sort((a, b) => a.localeCompare(b, "id", { numeric: true, sensitivity: "base" }));
 

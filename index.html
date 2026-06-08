@@ -37,6 +37,11 @@
       <div class="price-disclaimer">
         <p><strong>INFO PENTING:</strong> Harga pada website ini dapat berbeda dengan harga di outlet resmi. Jika ada selisih harga atau biaya tambahan, admin akan selalu menginfokan dan meminta persetujuanmu via WhatsApp sebelum memproses pesanan.</p>
       </div>
+      <nav class="brand-tabs" id="brandTabs" aria-label="Pilih brand kopi">
+        <button class="brand-tab active" type="button" data-brand="kopi-kenangan">Kopi Kenangan</button>
+        <button class="brand-tab" type="button" data-brand="tomoro">Tomoro</button>
+        <button class="brand-tab" type="button" data-brand="fore">Fore</button>
+      </nav>
       <section class="poster" aria-label="Price list jador kopi">
         <header class="poster-hero">
           <div class="brand-block">
@@ -47,8 +52,12 @@
                 <span></span>
               </div>
             </div>
-            <h1>kopi.fachrindah</h1>
-            <p>kopi kenangan</p>
+            <h1 id="brandTitle">kopi.fachrindah</h1>
+            <p id="brandSubtitle">Kopi Kenangan</p>
+          </div>
+
+          <div class="brand-summary" id="brandSummary">
+            <strong>Pilih brand di atas untuk melihat menu dan kategori spesifik.</strong>
           </div>
 
           <div class="title-block">
@@ -249,84 +258,8 @@
           </div>
 
           <div class="modal-stage" id="modalCustomize">
-            <div class="selected-drink modal-product" id="selectedDrink">
-              </div>
-            <div class="modal-options" id="modalOptions">
-              <div class="option-group" data-option-group="temperature" id="groupTemperature">
-                <div class="option-heading">
-                  <strong>Temperature</strong>
-                  <span>Select 1</span>
-                </div>
-                <div class="option-grid two">
-                  <button class="option-card selected" type="button" data-option-value="Ice">
-                    <span class="option-cup ice-cup"></span>
-                    <strong>Ice</strong>
-                  </button>
-                  <button class="option-card" type="button" data-option-value="Hot">
-                    <span class="option-cup hot-cup"></span>
-                    <strong>Hot</strong>
-                  </button>
-                </div>
-              </div>
-              
-              <div class="option-group" data-option-group="size" id="groupSize">
-                <div class="option-heading">
-                  <strong>Size</strong>
-                  <span>Select 1</span>
-                </div>
-                <div class="option-grid three">
-                  <button class="option-card selected" type="button" data-option-value="Regular" id="optRegularBtn">Regular</button>
-                  <button class="option-card" type="button" data-option-value="Large" id="optLargeBtn">Large</button>
-                  <button class="option-card" type="button" data-option-value="Jumbo" id="optJumboBtn">Jumbo</button>
-                </div>
-              </div>
-
-              <div class="option-group" data-option-group="beans" id="groupBeans">
-                <div class="option-heading">
-                  <strong>Biji Kopi (Beans)</strong>
-                  <span>Select 1</span>
-                </div>
-                <div class="option-grid two">
-                  <button class="option-card selected" type="button" data-option-value="Kenangan Blend">Kenangan Blend</button>
-                  <button class="option-card" type="button" data-option-value="Juwara Beans" id="optJuwaraBtn">Juwara Beans (+Rp3k)</button>
-                </div>
-              </div>
-
-              <div class="option-group" data-option-group="milk" id="groupMilk">
-                <div class="option-heading">
-                  <strong>Pilihan Susu (Milk)</strong>
-                  <span>Select 1</span>
-                </div>
-                <div class="option-grid two">
-                  <button class="option-card selected" type="button" data-option-value="Milk">Fresh Milk</button>
-                  <button class="option-card" type="button" data-option-value="Oatside" id="optOatsideBtn">Oatside (+Rp3k)</button>
-                </div>
-              </div>
-
-              <div class="option-group" data-option-group="sugar" id="groupSugar">
-                <div class="option-heading">
-                  <strong>Sugar Level</strong>
-                  <span>Select 1</span>
-                </div>
-                <div class="option-grid three" id="sugarGrid">
-                  <button class="option-card selected" type="button" data-option-value="Normal Sugar">Normal Sugar</button>
-                  <button class="option-card" type="button" data-option-value="Less Sugar">Less Sugar</button>
-                  <button class="option-card" type="button" data-option-value="No Sugar" id="optNoSugarBtn">No Sugar</button>
-                </div>
-              </div>
-
-              <div class="option-group" data-option-group="ice" id="groupIce">
-                <div class="option-heading">
-                  <strong>Ice Level</strong>
-                  <span>Select 1</span>
-                </div>
-                <div class="option-grid three">
-                  <button class="option-card selected" type="button" data-option-value="Normal Ice">Normal Ice</button>
-                  <button class="option-card" type="button" data-option-value="Less Ice">Less Ice</button>
-                  <button class="option-card" type="button" data-option-value="No Ice">No Ice</button>
-                </div>
-              </div>
-            </div>
+            <div class="selected-drink modal-product" id="selectedDrink"></div>
+            <div class="modal-options" id="modalOptions"></div>
             <button class="configure-button" id="addConfiguredItem" type="button" disabled>
               Tambahkan ke Keranjang
             </button>
@@ -491,10 +424,27 @@
       </div>
     </div>
 
+    <div id="iosInstallModal" class="modal-overlay hidden">
+      <div class="modal-content info-content">
+        <button id="closeIosInstallModal" class="close-btn" type="button" aria-label="Tutup instruksi install">&times;</button>
+        <h2 style="text-align:center; margin-bottom: 12px;">Install Aplikasi di iPhone</h2>
+        <p style="margin-bottom: 14px; line-height:1.6; color:#3c3029;">
+          Jika kamu menggunakan iPhone atau iPad, iOS tidak menyediakan tombol install otomatis.
+        </p>
+        <ol style="margin:0; padding-left: 1.2rem; color:#3c3029; line-height:1.7;">
+          <li>Buka menu <strong>Share</strong> (kotak dengan panah ke atas).</li>
+          <li>Pilih <strong>Add to Home Screen</strong>.</li>
+          <li>Ikon aplikasi akan tampil di layar utama.</li>
+        </ol>
+        <p style="margin-top: 16px; color:#7a6456; font-size:0.95rem;">Untuk Android, tombol install akan memicu prompt PWA biasa jika tersedia.</p>
+      </div>
+    </div>
+
     <!-- SCRIPT (BIARKAN TETAP DI BAWAH) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     <script src="gallery-images.js"></script>
+    <script src="menu-data.js"></script>
     <script src="script.js"></script>
   </body>
 </html>
