@@ -177,6 +177,28 @@ function updateBrandHero() {
   if (brandSummary) {
     brandSummary.innerHTML = `<strong>${escapeHtml(activeBrand.label)}</strong> · ${escapeHtml(activeBrand.description)}`;
   }
+
+  // --- LOGIKA BARU UNTUK BADGE MINIMAL ORDER ---
+  const minBadge = document.querySelector(".min-badge");
+  if (minBadge) {
+    if (activeBrand.id === "fore") {
+      // Tampilan jika tab Fore dipilih (Bisa diganti teksnya sesuai selera)
+      minBadge.innerHTML = `
+        <span>Tanpa</span>
+        <strong>Minimal</strong>
+        <span>Order</span>
+      `;
+      // Opsi lain jika ingin teks "TANPA MIN ORDER":
+      // minBadge.innerHTML = `<span>TANPA</span><strong style="font-size: 1.8rem; margin: 4px 0;">MIN</strong><span>ORDER</span>`;
+    } else {
+      // Tampilan default untuk Kopi Kenangan & Tomoro
+      minBadge.innerHTML = `
+        <span>MINIMAL</span>
+        <strong>2</strong>
+        <span>MENU</span>
+      `;
+    }
+  }
 }
 
 function getActiveMenuItems() {
