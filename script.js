@@ -25,7 +25,7 @@ function checkStoreStatus() {
     return { closed: true, message: "Maaf, toko sedang istirahat untuk ibadah Sholat Jumat dan akan buka kembali otomatis pukul 13:00 WIB.<br><br>Punya pertanyaan atau mau titip pesanan? Langsung chat admin aja ya." + waButtonHtml };
   }
 
-  return { closed: false };
+  return { closed: true };
 }
 
 function getJakartaDate() {
