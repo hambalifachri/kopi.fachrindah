@@ -9,7 +9,26 @@ const categories = [
   { id: "food", title: "Food" },
 ];
 
+// ==== Pengaturan Toko: Buka / Tutup ====
+// Ubah "open" menjadi "closed" untuk menutup salah satu toko.
+// Toko yang "closed" tidak bisa menerima pesanan (menu-nya tidak bisa masuk keranjang),
+// sedangkan toko lain tetap bisa menerima pesanan secara terpisah.
+const STORE_CONFIG = {
+  kopken: { label: "Kopken", status: "open" },
+  fore: { label: "Fore", status: "open" },
+};
+
+// Toko default untuk menu yang belum punya field `store`.
+// Semua menu Kopi Kenangan di bawah ini otomatis dianggap milik toko "kopken".
+// Untuk menu Fore, tambahkan `store: "fore"` pada item-nya.
+const DEFAULT_STORE = "kopken";
+
 const menuItems = [
+
+  // ==== Contoh Bundle (bisa diedit / dihapus sesuai kebutuhan) ====
+  // Item bundle ditandai `kind: "bundle"`. Minuman bawaan diatur lewat `bundle.drinkId`.
+  // Pelanggan hanya bisa mengganti minuman dengan minuman lain yang HARGANYA SAMA.
+  { id: "bundle-hemat-kopi-roti", group: "promo-combo", name: "Bundle Hemat (Kopi + Roti)", oldPrice: 30000, price: 24000, color: "#8d4a27", foam: "#f3d3b1", drizzle: "#5d2d19", kind: "bundle", store: "kopken", bundle: { drinkId: "kopi-kenangan-mantan" } },
 
   { id: "og-thai-tea", group: "baru", name: "OG Thai Tea", oldPrice: 19000, price: 12000, color: "#e56d17", foam: "#fff1df", drizzle: "#d35c19", isNew: true },
   { id: "thai-tea-loaded", group: "baru", name: "Thai Tea Loaded", oldPrice: 27000, price: 16000, color: "#cf6b20", foam: "#fff4e5", drizzle: "#5b2f1b", isNew: true },
@@ -196,7 +215,10 @@ menuItems.forEach((item) => {
 
 const cart = new Map();
 let pendingItemId = "";
+let selectedBundleDrink = null;
 let proofPreviewUrl = "";
+
+const CART_STORAGE_KEY = "kopiFachrindahCart";
 let supabaseClient = null;
 const selectedOptions = {
   temperature: "Ice",
@@ -244,7 +266,9 @@ const proofHelp = document.querySelector("#proofHelp");
 const shareProofButton = document.querySelector("#shareProofButton");
 const optionGroups = document.querySelectorAll("[data-option-group]");
 const selectedDrink = document.querySelector("#selectedDrink");
+const bundleChooser = document.querySelector("#bundleChooser");
 const addConfiguredItemButton = document.querySelector("#addConfiguredItem");
+const infoModal = document.querySelector("#infoModal");
 
 function menuVisual(item) {
   if (item.image) {
@@ -279,10 +303,13 @@ function menuVisual(item) {
 } */
 
   function menuCard(item) {
+  const store = getItemStore(item);
+  const storeClosed = !isStoreOpen(store);
   return `
-    <article class="menu-card ${item.isNew ? "new" : ""}">
+    <article class="menu-card ${item.isNew ? "new" : ""} ${storeClosed ? "store-closed" : ""}">
       ${menuVisual(item)}
       <h3>${item.name}</h3>
+      ${storeClosed ? `<span class="closed-badge">Toko ${getStoreLabel(store)} Tutup</span>` : ""}
 
       ${
         item.oldPrice
@@ -292,8 +319,8 @@ function menuVisual(item) {
 
       <span class="price">${rupiah.format(item.price)}</span>
 
-      <button class="add-button" type="button" data-id="${item.id}">
-        Tambah
+      <button class="add-button" type="button" data-id="${item.id}" ${storeClosed ? "disabled" : ""}>
+        ${storeClosed ? "Tutup" : "Tambah"}
       </button>
     </article>
   `;
@@ -347,7 +374,7 @@ function renderCart() {
   } else {
     cartItems.innerHTML = entries
       .map((item) => {
-        const optionsText = formatOptions(item.options);
+        const optionsText = getItemOptionLines(item).join(" / ");
         return `
           <div class="cart-line">
             <div>
@@ -366,6 +393,7 @@ function renderCart() {
       .join("");
   }
 
+  persistCart();
   subtotalEl.textContent = rupiah.format(subtotal);
   grandTotalEl.textContent = rupiah.format(subtotal);
   const totalQty = entries.reduce((total, item) => total + item.qty, 0);
@@ -387,7 +415,7 @@ function renderCheckoutSummary(entries, subtotal) {
     <div class="checkout-lines">
       ${entries
         .map((item) => {
-          const optionsText = formatOptions(item.options);
+          const optionsText = getItemOptionLines(item).join(" / ");
           return `
             <div>
               <span>${item.name} x${item.qty}</span>
@@ -407,6 +435,121 @@ function renderCheckoutSummary(entries, subtotal) {
 
 function formatOptions(options) {
   return [options.temperature, options.size, options.sugar, options.ice].filter(Boolean).join(" / ");
+}
+
+// ==== Helper Toko (buka/tutup) ====
+function getItemStore(item) {
+  return item && item.store ? item.store : DEFAULT_STORE;
+}
+
+function isStoreOpen(store) {
+  const config = STORE_CONFIG[store];
+  return !config || config.status !== "closed";
+}
+
+function getStoreLabel(store) {
+  const config = STORE_CONFIG[store];
+  return config ? config.label : store;
+}
+
+function getStoreQuantity(store) {
+  return [...cart.values()]
+    .filter((item) => getItemStore(item) === store)
+    .reduce((total, item) => total + item.qty, 0);
+}
+
+// Minimal order Kopken adalah 2 item; Fore tidak ada minimal.
+function getMinimumOrderError() {
+  const kopkenQty = getStoreQuantity("kopken");
+  if (kopkenQty > 0 && kopkenQty < 2) {
+    return "Minimal order untuk Kopken adalah 2 item (boleh digabung makanan). Tambah 1 menu Kopken lagi dulu ya.";
+  }
+  return "";
+}
+
+// ==== Helper Bundle ====
+function getBundleDefaultDrink(item) {
+  if (!item || !item.bundle) return null;
+  return menuItems.find((menuItem) => menuItem.id === item.bundle.drinkId) || null;
+}
+
+// Minuman pengganti hanya yang harganya sama dengan minuman bawaan bundle.
+function getBundleDrinkOptions(item) {
+  const defaultDrink = getBundleDefaultDrink(item);
+  if (!defaultDrink) return [];
+  return menuItems.filter(
+    (menuItem) =>
+      !isFoodItem(menuItem) &&
+      menuItem.kind !== "bundle" &&
+      menuItem.price === defaultDrink.price &&
+      isStoreOpen(getItemStore(menuItem))
+  );
+}
+
+// Gabungan baris detail (minuman bundle + temperature/size/sugar/ice) untuk 1 item keranjang.
+function getItemOptionLines(item) {
+  const lines = [];
+  if (item.bundleDrink) {
+    lines.push(`Minuman: ${item.bundleDrink.name}`);
+  }
+  const options = item.options || {};
+  [options.temperature, options.size, options.sugar, options.ice]
+    .filter(Boolean)
+    .forEach((value) => lines.push(value));
+  return lines;
+}
+
+// ==== Penyimpanan Keranjang (anti-refresh) ====
+function persistCart() {
+  try {
+    const entries = [...cart.values()].map((item) => ({
+      id: item.id,
+      cartKey: item.cartKey,
+      qty: item.qty,
+      options: item.options || {},
+      bundleDrinkId: item.bundleDrink ? item.bundleDrink.id : null,
+    }));
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(entries));
+  } catch (error) {
+    /* localStorage tidak tersedia (mode privat dll), abaikan saja */
+  }
+}
+
+function clearStoredCart() {
+  try {
+    localStorage.removeItem(CART_STORAGE_KEY);
+  } catch (error) {
+    /* abaikan */
+  }
+}
+
+function loadCartFromStorage() {
+  let stored = [];
+  try {
+    stored = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || "[]");
+  } catch (error) {
+    stored = [];
+  }
+  if (!Array.isArray(stored)) return;
+
+  stored.forEach((entry) => {
+    const item = menuItems.find((menuItem) => menuItem.id === entry.id);
+    if (!item) return;
+    // Jangan kembalikan menu dari toko yang sekarang sudah tutup.
+    if (!isStoreOpen(getItemStore(item))) return;
+    const options = entry.options || {};
+    const bundleDrink = entry.bundleDrinkId
+      ? menuItems.find((menuItem) => menuItem.id === entry.bundleDrinkId) || null
+      : null;
+    const cartKey = entry.cartKey || `${item.id}|${Object.values(options).join("|")}`;
+    cart.set(cartKey, {
+      ...item,
+      cartKey,
+      options,
+      bundleDrink,
+      qty: Math.max(1, Number(entry.qty) || 1),
+    });
+  });
 }
 
 function escapeHtml(value) {
@@ -613,9 +756,16 @@ function addItem(id) {
   const item = menuItems.find((menuItem) => menuItem.id === id);
   if (!item) return;
 
-  const options = isFoodItem(item) ? {} : { ...selectedOptions };
+  const store = getItemStore(item);
+  if (!isStoreOpen(store)) {
+    alert(`Maaf, toko ${getStoreLabel(store)} sedang tutup. Menu ini belum bisa dipesan.`);
+    return;
+  }
 
-  const cartKey = `${id}|${Object.values(options).join("|")}`;
+  const options = isFoodItem(item) ? {} : { ...selectedOptions };
+  const bundleDrink = item.kind === "bundle" ? selectedBundleDrink : null;
+
+  const cartKey = `${id}|${Object.values(options).join("|")}|${bundleDrink ? bundleDrink.id : ""}`;
 
   const current = cart.get(cartKey);
 
@@ -623,18 +773,59 @@ function addItem(id) {
     ...item,
     cartKey,
     options,
+    bundleDrink,
     qty: current ? current.qty + 1 : 1
   });
 
   renderCart();
 }
 
+function renderBundleChooser(item) {
+  selectedBundleDrink = null;
+  if (!bundleChooser) return;
+
+  if (!item || item.kind !== "bundle") {
+    bundleChooser.hidden = true;
+    bundleChooser.innerHTML = "";
+    return;
+  }
+
+  const defaultDrink = getBundleDefaultDrink(item);
+  const drinkOptions = getBundleDrinkOptions(item);
+  selectedBundleDrink = defaultDrink;
+  bundleChooser.hidden = false;
+  bundleChooser.innerHTML = `
+    <div class="option-heading">
+      <strong>Pilih Minuman Bundle</strong>
+      <span>Harga sama</span>
+    </div>
+    <p class="bundle-note">Minuman bawaan: <strong>${defaultDrink ? defaultDrink.name : "-"}</strong>. Bisa diganti dengan minuman lain yang harganya sama (${defaultDrink ? rupiah.format(defaultDrink.price) : "-"}).</p>
+    <div class="option-grid two">
+      ${drinkOptions
+        .map(
+          (drink) => `
+        <button class="option-card ${defaultDrink && drink.id === defaultDrink.id ? "selected" : ""}" type="button" data-bundle-drink="${drink.id}">
+          ${drink.name}
+        </button>`
+        )
+        .join("")}
+    </div>
+  `;
+}
+
 function selectItemForOptions(id) {
   const item = menuItems.find((menuItem) => menuItem.id === id);
   if (!item) return;
 
+  const store = getItemStore(item);
+  if (!isStoreOpen(store)) {
+    alert(`Maaf, toko ${getStoreLabel(store)} sedang tutup. Menu ini belum bisa dipesan.`);
+    return;
+  }
+
   pendingItemId = id;
   resetSelectedOptions();
+  renderBundleChooser(item);
 
   const needsOptions = !isFoodItem(item);
   modalOptions.hidden = !needsOptions;
@@ -669,9 +860,12 @@ function buildWhatsappMessage(formData, savedOrder) {
   const proofFile = formData.get("paymentProof");
   const proofFileName = proofFile && proofFile.name ? proofFile.name : "-";
   const orderLines = entries
-    .map((item) => {
-      const optionsText = formatOptions(item.options);
-      return `- ${item.name} x${item.qty}${optionsText ? ` (${optionsText})` : ""} = ${rupiah.format(item.price * item.qty)}`;
+    .map((item, index) => {
+      const header = `${index + 1}. ${item.name} x${item.qty} = ${rupiah.format(item.price * item.qty)}`;
+      const detailLines = getItemOptionLines(item)
+        .map((option) => `    \u2022 ${option}`)
+        .join("\n");
+      return detailLines ? `${header}\n${detailLines}` : header;
     })
     .join("\n");
 
@@ -876,8 +1070,9 @@ continueShoppingButton.addEventListener("click", () => {
 });
 
 goCheckoutButton.addEventListener("click", () => {
-  if (getCartQuantity() < 2) {
-    alert("Minimal order 2 menu ya. Tambah 1 menu lagi dulu.");
+  const minimumError = getMinimumOrderError();
+  if (minimumError) {
+    alert(minimumError);
     setModalStage("cart");
     return;
   }
@@ -896,7 +1091,12 @@ openCartButton.addEventListener("click", () => {
 });
 
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && orderModal.classList.contains("open")) {
+  if (event.key !== "Escape") return;
+  if (infoModal && infoModal.classList.contains("open")) {
+    closeInfoModal();
+    return;
+  }
+  if (orderModal.classList.contains("open")) {
     closeOrderModal();
   }
 });
@@ -966,8 +1166,9 @@ orderForm.addEventListener("submit", async (event) => {
     return;
   }
 
-  if (getCartQuantity() < 2) {
-    alert("Minimal order 2 menu ya.");
+  const minimumError = getMinimumOrderError();
+  if (minimumError) {
+    alert(minimumError);
     return;
   }
 
@@ -995,6 +1196,7 @@ orderForm.addEventListener("submit", async (event) => {
 
     // 3. Bersihkan form & keranjang belanja
     cart.clear();
+    clearStoredCart();
     orderForm.reset();
     updateProofPreview();
     renderCart();
@@ -1045,5 +1247,41 @@ backToTop.addEventListener("click", () => {
   window.scrollTo({ top: 0, behavior: "smooth" });
 });
 
+function openInfoModal() {
+  if (!infoModal) return;
+  infoModal.classList.add("open");
+  infoModal.setAttribute("aria-hidden", "false");
+}
+
+function closeInfoModal() {
+  if (!infoModal) return;
+  infoModal.classList.remove("open");
+  infoModal.setAttribute("aria-hidden", "true");
+}
+
+if (infoModal) {
+  infoModal.addEventListener("click", (event) => {
+    if (event.target.closest("[data-close-info]")) {
+      closeInfoModal();
+    }
+  });
+}
+
+if (bundleChooser) {
+  bundleChooser.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-bundle-drink]");
+    if (!button) return;
+    const drink = menuItems.find((menuItem) => menuItem.id === button.dataset.bundleDrink);
+    if (!drink) return;
+    selectedBundleDrink = drink;
+    bundleChooser
+      .querySelectorAll("[data-bundle-drink]")
+      .forEach((option) => option.classList.remove("selected"));
+    button.classList.add("selected");
+  });
+}
+
+loadCartFromStorage();
 renderMenu();
 renderCart();
+openInfoModal();

@@ -1689,3 +1689,108 @@ textarea:focus {
     border-left: 0;
   }
 }
+
+/* ==== Toko tutup (store-closed) ==== */
+.menu-card.store-closed {
+  opacity: 0.62;
+}
+
+.closed-badge {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--red);
+  color: var(--white);
+  font-size: 0.62rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.menu-card.store-closed .add-button {
+  background: #b3a19a;
+  cursor: not-allowed;
+}
+
+/* ==== Pemilihan minuman bundle ==== */
+.bundle-chooser {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 2px dashed var(--line);
+  border-radius: 12px;
+  background: #fffdf9;
+}
+
+.bundle-chooser[hidden] {
+  display: none;
+}
+
+.bundle-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+/* ==== Pop-up informasi awal ==== */
+.info-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: none;
+  place-items: center;
+  padding: 18px;
+}
+
+.info-modal.open {
+  display: grid;
+}
+
+.info-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(23, 11, 6, 0.62);
+}
+
+.info-card {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 12px;
+  width: min(100%, 420px);
+  padding: 22px;
+  border: 2px solid var(--line);
+  border-radius: 16px;
+  background: var(--white);
+  box-shadow: 0 24px 60px rgba(23, 11, 6, 0.32);
+  text-align: center;
+}
+
+.info-card h2 {
+  margin: 0;
+  color: var(--brown);
+  font-family: Fredoka, Inter, sans-serif;
+  font-size: 1.5rem;
+}
+
+.info-card p {
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.info-button {
+  justify-self: center;
+  min-width: 160px;
+  margin-top: 4px;
+  padding: 11px 22px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--brown);
+  color: var(--white);
+  font-weight: 900;
+  cursor: pointer;
+}

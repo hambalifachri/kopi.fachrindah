@@ -198,6 +198,7 @@
               <span>Belum pilih menu</span>
               <strong>Klik tombol Tambah di price list dulu</strong>
             </div>
+            <div class="bundle-chooser" id="bundleChooser" hidden></div>
             <div class="modal-options" id="modalOptions">
               <div class="option-group" data-option-group="temperature">
                 <div class="option-heading">
@@ -359,6 +360,21 @@
               <button class="review-button" type="submit">Tampilkan Review di Website</button>
             </form>
           </div>
+        </section>
+      </div>
+
+      <div class="info-modal" id="infoModal" aria-hidden="true">
+        <div class="info-backdrop" data-close-info></div>
+        <section class="info-card" role="dialog" aria-modal="true" aria-labelledby="infoModalTitle">
+          <h2 id="infoModalTitle">Informasi</h2>
+          <p>
+            Untuk pemesanan <strong>Kopken</strong>, minimal pesanan adalah 2 item
+            (bisa digabung dengan makanan). Untuk pemesanan <strong>Fore</strong>,
+            tidak ada minimal pesanan.
+          </p>
+          <button class="info-button" id="closeInfoModal" type="button" data-close-info>
+            Mengerti
+          </button>
         </section>
       </div>
 
