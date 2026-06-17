@@ -3,26 +3,24 @@
 // ==========================================
 const storeConfig = STORE_CONFIG_DATA;
 
-function checkStoreStatus() {
-  // MENGUNCI WAKTU KE WIB (JAKARTA)
-  // Jadi walaupun jam HP pelanggan error, toko tetap ikut waktu WIB yang asli
+function checkStoreStatus(brandId) {
   const now = getJakartaDate();
-
-  const day = now.getDay(); // 0 = Minggu, 5 = Jumat
-  const hour = now.getHours(); // Format 24 jam
+  const day = now.getDay(); 
+  const hour = now.getHours(); 
   
-  // Link WA otomatis jika pelanggan butuh chat mendadak
-  const waLink = "https://wa.me/6281281400462?text=Halo%20admin%20kopi.fachrindah,%20saya%20mau%20tanya-tanya%20dulu%20dong.";
-  const waButtonHtml = `<br><br><a href="${waLink}" target="_blank" class="wa-direct-btn">Chat WhatsApp Admin</a>`;
+  const waLink = "<br><br><a href='https://wa.me/6281281400462?text=Halo%20admin%20kopi.fachrindah,%20saya%20mau%20tanya-tanya%20dulu%20dong.' target='_blank' class='wa-direct-btn'>Chat WhatsApp Admin</a>";
 
-  // 1. Cek apakah admin menutup manual
-  if (storeConfig.isManualClosed) {
-    return { closed: true, message: "Maaf, saat ini toko sedang tutup sementara. Jika ada kebutuhan mendesak, silakan langsung hubungi kami via WhatsApp ya." + waButtonHtml };
+  // 1. Cek penutupan spesifik per brand
+  if (brandId === 'kopi-kenangan' && storeConfig.isKopkenClosed) {
+    return { closed: true, message: storeConfig.manualClosedMessage + waLink };
+  }
+  if (brandId === 'fore' && storeConfig.isForeClosed) {
+    return { closed: true, message: storeConfig.manualClosedMessage + waLink };
   }
 
-  // 2. Cek apakah sedang jam Sholat Jumat (Hari 5, Jam 12)
+  // 2. Cek Sholat Jumat (Berlaku untuk semua)
   if (storeConfig.autoJumatan && day === 5 && hour === 12) {
-    return { closed: true, message: "Maaf, toko sedang istirahat untuk ibadah Sholat Jumat dan akan buka kembali otomatis pukul 13:00 WIB.<br><br>Punya pertanyaan atau mau titip pesanan? Langsung chat admin aja ya." + waButtonHtml };
+    return { closed: true, message: "Maaf, toko sedang istirahat untuk ibadah Sholat Jumat dan akan buka kembali otomatis pukul 13:00 WIB.<br><br>Punya pertanyaan atau mau titip pesanan? Langsung chat admin aja ya." + waLink };
   }
 
   return { closed: false };
@@ -290,16 +288,21 @@ function getKenanganOptionGroups(item) {
         ],
   });
 
-  groups.push({
+groups.push({
     key: "ice",
     label: "Ice Level",
     hiddenValue: "No Ice",
     dependsOn: { key: "temperature", value: "Ice" },
-    options: [
-      { value: "Normal Ice", label: "Normal Ice" },
-      { value: "Less Ice", label: "Less Ice" },
-      { value: "No Ice", label: "No Ice" },
-    ],
+    // LOGIKA BARU: Cek apakah menu ini dikunci es-nya
+    options: item.onlyNormalIce 
+      ? [
+          { value: "Normal Ice", label: "Normal Ice" }
+        ]
+      : [
+          { value: "Normal Ice", label: "Normal Ice" },
+          { value: "Less Ice", label: "Less Ice" },
+          { value: "No Ice", label: "No Ice" },
+        ],
   });
 
   return groups;
@@ -313,11 +316,18 @@ function cloneOptionGroups(groups) {
 }
 
 function getItemOptionGroups(item) {
+  // Pastikan menu makanan langsung masuk keranjang, tapi Bundle tetap memunculkan pop-up
   if (isFoodItem(item)) return [];
+
+  // Jika di menu-data.js kita memasukkan kustomisasi "options" pada bundle, gunakan itu!
   const itemOptions = Array.isArray(item.options) ? cloneOptionGroups(item.options) : null;
-  const baseOptions = itemOptions || (item.brand === "kopi-kenangan"
+  if (itemOptions) return itemOptions;
+
+  // Jika tidak ada options khusus, gunakan settingan bawaan brand
+  const baseOptions = item.brand === "kopi-kenangan"
     ? getKenanganOptionGroups(item)
-    : cloneOptionGroups(getBrandById(item.brand).defaultOptions));
+    : cloneOptionGroups(getBrandById(item.brand).defaultOptions);
+    
   const addOns = Array.isArray(item.addOns) ? cloneOptionGroups(item.addOns) : [];
   return [...baseOptions, ...addOns].filter((group) => group.options && group.options.length);
 }
@@ -426,13 +436,12 @@ function menuVisual(item) {
 
 // Ganti fungsi menuCard lama dengan ini:
 function menuCard(item) {
-  const store = checkStoreStatus();
+  // Pengecekan status toko sekarang MENGGUNAKAN brand item tersebut
+  const store = checkStoreStatus(item.brand);
   
-  // Kalau toko tutup, paksa semua menu jadi statusnya habis/mati
   let currentlySoldOut = item.isSoldOut === true || store.closed;
   let unlockMessage = "";
 
-  // Tampilkan pesan di atas gambar
   if (store.closed) {
     unlockMessage = `<span class="unlock-time">TOKO TUTUP</span>`;
   } else if (item.soldOutUntil) {
@@ -454,17 +463,23 @@ function menuCard(item) {
   const sizeBlockNotes = getActiveSizeBlockNotes(item);
   const sizeBlockHtml = sizeBlockNotes.length ? `<span class="sale-note">${sizeBlockNotes.join(" · ")}</span>` : "";
   
-  // Ganti teks tombol jika sedang tutup
   const buttonText = store.closed ? "Tutup" : (currentlySoldOut ? "Habis" : "Tambah");
   const buttonHtml = currentlySoldOut 
     ? `<button class="add-button" type="button" disabled>${buttonText}</button>`
     : `<button class="add-button" type="button" data-id="${item.id}">Tambah</button>`;
 
-  return `<article class="menu-card ${item.isNew ? "new" : ""} ${bestSellerClass} ${soldOutClass} ${brandClass}">
+return `<article class="menu-card ${item.isNew ? "new" : ""} ${bestSellerClass} ${soldOutClass} ${brandClass}">
     ${menuVisual(item)}
     ${unlockMessage}
     <span class="menu-brand" style="--brand-accent: ${itemBrand.accent}">${escapeHtml(itemBrand.shortLabel)}</span>
-    <h3>${escapeHtml(item.name)}</h3>
+    
+    <!-- 👇 BUNGKUSAN FINAL (MENGHANCURKAN KUNCIAN TINGGI H3) 👇 -->
+    <div style="margin-bottom: auto; display: flex; flex-direction: column; gap: 4px; align-items: center; width: 100%;">
+      <h3 style="margin: 0 !important; padding: 0 !important; height: auto !important; min-height: 0 !important; line-height: 1.2 !important;">${escapeHtml(item.name)}</h3>
+      ${item.desc ? `<span style="color: #777; font-size: 0.75rem; font-weight: 600; line-height: 1.3; text-align: center; max-width: 95%; margin: 0 !important;">${escapeHtml(item.desc)}</span>` : ""}
+    </div>
+    <!-- 👆 SAMPAI SINI 👆 -->
+    
     ${item.oldPrice ? `<span class="old-price">${rupiah.format(item.oldPrice)}</span>` : ""}
     <span class="price">${rupiah.format(item.price)}</span>
     ${sizeBlockHtml}
@@ -473,6 +488,70 @@ function menuCard(item) {
 }
 
 function normalizeText(value) { return String(value).toLowerCase().trim(); }
+
+// FITUR PENYIMPANAN KERANJANG (ANTI-REFRESH)
+function saveCartToStorage() {
+  localStorage.setItem('kopiFachrindahCart', JSON.stringify(Array.from(cart.entries())));
+}
+
+function loadCartFromStorage() {
+  const saved = localStorage.getItem('kopiFachrindahCart');
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      parsed.forEach(([k, v]) => cart.set(k, v));
+      renderCart();
+    } catch(e) {}
+  }
+}
+
+// Tambahkan pemanggilan saveCartToStorage() ke dalam aksi keranjang
+const originalAddItem = addItem;
+addItem = function(id) { originalAddItem(id); saveCartToStorage(); };
+
+const originalUpdateQuantity = updateQuantity;
+updateQuantity = function(cartKey, direction) { originalUpdateQuantity(cartKey, direction); saveCartToStorage(); };
+
+clearCartButton.addEventListener("click", () => { cart.clear(); saveCartToStorage(); renderCart(); });
+
+// FITUR POP-UP INFORMASI DI AWAL (LANGSUNG JALAN)
+// ==========================================
+(function showWelcomePopup() {
+  // Panggil fungsi auto-save keranjang & biodata (jika ada)
+  if (typeof loadCartFromStorage === "function") loadCartFromStorage();
+  if (typeof loadBiodataFromStorage === "function") loadBiodataFromStorage();
+
+  // Cek apakah pop-up sudah pernah muncul di sesi ini
+  if (!sessionStorage.getItem('welcomePopUpShown')) {
+    const welcomeHtml = `
+      <div id="welcomeModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 99999;">
+        <div class="info-content" style="background: #fff; padding: 24px; border-radius: 12px; max-width: 90%; width: 400px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: popUpAnim 0.3s ease-out;">
+          <h2 style="color: #d94b3d; margin-bottom: 15px; margin-top: 0;">📢 Info Pemesanan</h2>
+          <div style="text-align: left; margin-bottom: 20px; font-size: 0.95rem; color: #444; line-height: 1.5;">
+            <p style="margin-bottom: 12px;"><strong>☕ Kopi Kenangan:</strong><br>Minimal pemesanan <strong>2 item</strong> (Bisa digabung dengan menu makanan/promo).</p>
+            <p style="margin: 0;"><strong>🍃 Fore Coffee:</strong><br>Tidak ada minimal pesanan (Bebas pesan 1 item saja).</p>
+          </div>
+          <button id="closeWelcomeBtn" class="send-button" style="width: 100%; border-radius: 999px;">Saya Mengerti</button>
+        </div>
+      </div>
+    `;
+    
+    // Paksa masukkan pop-up ke dalam HTML saat ini juga
+    document.body.insertAdjacentHTML('beforeend', welcomeHtml);
+    
+    // Beri fungsi klik untuk menutup pop-up
+    const closeBtn = document.getElementById('closeWelcomeBtn');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => {
+        const modal = document.getElementById('welcomeModal');
+        if (modal) modal.remove();
+      });
+    }
+    
+    // Tandai bahwa pop-up sudah pernah dilihat
+    sessionStorage.setItem('welcomePopUpShown', 'true');
+  }
+})();
 
 function renderMenu(query = "") {
   renderBrandTabs();
@@ -642,9 +721,9 @@ async function saveOrderToSupabase(order) {
 }
 
 function isFoodItem(item) { 
-  // Menu akan langsung masuk keranjang (tanpa popup opsi) jika grupnya adalah makanan ATAU mengandung kata "promo"
+  // Sekarang sistem akan mengenali makanan dari 'group' ATAU dari 'kind' nya
   return ["food", "chef-martin", "kenangan-toast", "fore-deli"].includes(item.group) || 
-         (item.group && item.group.includes("promo")); 
+         ["food", "toast", "cookie"].includes(item.kind); 
 }
 
 function resetSelectedOptions(item) {
@@ -772,13 +851,56 @@ function updateQuantity(cartKey, direction) {
   renderCart();
 }
 
+// FUNGSI BARU: Khusus merapikan opsi di WhatsApp agar tidak menyamping
+function formatOptionsForWA(options) {
+  if (!options || Object.keys(options).length === 0) return "";
+  const entries = Object.entries(options).filter(([, value]) => Boolean(value));
+  if (entries.length === 0) return "";
+  
+  return entries.map(([key, value], index) => {
+    const isLast = index === entries.length - 1;
+    const prefix = isLast ? "└" : "├"; // Garis cabang agar mudah dibaca
+    return `   ${prefix} ${formatOptionKey(key)}: ${value}`;
+  }).join("\n");
+}
+
 function buildWhatsappMessage(formData, savedOrder) {
   const entries = [...cart.values()];
   const subtotal = entries.reduce((total, item) => total + item.price * item.qty, 0);
-  const orderLines = entries.map(item => `- ${item.name} x${item.qty} (${formatOptions(item.options)}) = ${rupiah.format(item.price * item.qty)}`).join("\n");
+  
+  // Format pesanan dengan enter, nomor urut, huruf tebal, dan indentasi
+  const orderLines = entries.map((item, index) => {
+    // Ambil opsi kustom jika ada
+    const ops = item.options && Object.keys(item.options).length > 0
+      ? `\n${formatOptionsForWA(item.options)}`
+      : "";
+      
+    // Format: 1. *2x Kopi Susu* (Fore)
+    return `${index + 1}. *${item.qty}x ${item.name}* (${getBrandById(item.brand).shortLabel})${ops}`;
+  }).join("\n\n"); // Enter 2x antar menu agar tidak berdempetan
+
   const brandName = getCartBrandName() || getActiveBrand().label;
 
-  return ["Halo admin kopi.fachrindah, saya mau order jasdor.", `ID Order: ${savedOrder.id}`, `Brand: ${brandName}`, `Nama: ${formData.get("customerName")}`, `WhatsApp: ${formData.get("customerPhone")}`, `Lokasi outlet: ${formData.get("customerAddress")}`, "", "Pesanan:", orderLines, "", `Total bayar sementara: ${rupiah.format(subtotal)}`, "Catatan harga: jika harga outlet berbeda, mohon konfirmasi selisihnya dulu sebelum pesanan diproses.", `Link bukti transfer: ${savedOrder.proof.url}`, `Catatan customer: ${formData.get("orderNote") || "-"}`].join("\n");
+  // Rangkai seluruh pesan dengan format Bold (*) dan Italic (_)
+  return [
+    "Halo admin kopi.fachrindah, ada pesanan *JASDOR* baru! 🚀", 
+    "",
+    `*ID Order:* ${savedOrder.id}`, 
+    `*Brand:* ${brandName}`, 
+    `*Nama:* ${formData.get("customerName")}`, 
+    `*WhatsApp:* ${formData.get("customerPhone")}`, 
+    `*Lokasi Outlet:* ${formData.get("customerAddress")}`, 
+    "", 
+    "📦 *DAFTAR PESANAN:*",
+    "-----------------------------------",
+    orderLines, 
+    "-----------------------------------",
+    `*TOTAL SEMENTARA: ${rupiah.format(subtotal)}*`, 
+    "_Catatan Harga: Jika harga outlet berbeda, mohon konfirmasi selisihnya terlebih dahulu sebelum diproses._", 
+    "",
+    `*Catatan Pembeli:* ${formData.get("orderNote") || "-"}`,
+    `*Bukti Transfer:* ${savedOrder.proof.url}`
+  ].join("\n");
 }
 
 function buildWhatsappLinks(adminPhone, encodedMessage) {
@@ -887,28 +1009,25 @@ continueShoppingButton.addEventListener("click", () => closeOrderModal());
 // FIX: Memperbaiki aksi klik tombol "Selesai, Bayar QRIS"
 // FIX: Memperbaiki aksi klik tombol "Selesai, Bayar QRIS" dengan pengecualian Bundling
 // GEMBOK REAL-TIME: Memperbaiki aksi klik tombol "Selesai, Bayar QRIS" saat testing lokal
+// Pada goCheckoutButton
 goCheckoutButton.addEventListener("click", () => { 
-  // 1. Ambil status toko detik ini juga saat tombol diklik
-  const store = checkStoreStatus();
+  const cartBrandId = getCartBrandId();
+  const store = checkStoreStatus(cartBrandId);
   
-  // 2. Jika toko terdeteksi tutup, langsung block di sini!
   if (store.closed) {
-    alert("Maaf, saat ini toko sedang tutup / istirahat untuk Sholat Jumat. Silakan kembali lagi nanti atau hubungi WhatsApp admin (081281400462).");
-    return; // Mencegah masuk ke tahap checkout biodata
+    alert("Maaf, saat ini toko untuk brand tersebut sedang tutup / istirahat. Silakan hubungi WhatsApp admin.");
+    return;
   }
 
-  // 3. Jika toko buka, jalankan aturan minimal order seperti biasa
   const totalQty = getCartQuantity();
   const hasBundling = [...cart.values()].some(item => item.group && item.group.includes("promo"));
-  
-  // 4. Deteksi apakah keranjang berisi brand Fore Coffee
-  const isForeCoffee = getCartBrandId() === "fore";
+  const isForeCoffee = cartBrandId === "fore";
 
-  // 5. Izinkan checkout JIKA: Total >= 2 ATAU ada Bundling ATAU brand-nya Fore Coffee
   if (totalQty >= 2 || hasBundling || isForeCoffee) { 
     setModalStage("checkout"); 
   } else {
-    alert(`Pesanan kamu baru ${totalQty} menu. Minimal pemesanan adalah 2 menu satuan (Kecuali untuk menu Fore Coffee atau pembelian Paket Promo / Bundling).`);
+    // Teks yang diperbarui
+    alert(`Pesanan kamu baru ${totalQty} menu.\nMinimal untuk Kopi Kenangan adalah 2 item (Bisa gabung makanan/bundle).\nUntuk Fore, tidak ada minimal pesanan.`);
   }
 });
 
@@ -930,7 +1049,17 @@ orderForm.addEventListener("submit", async (event) => {
     await saveOrderToSupabase(savedOrder);
     const message = encodeURIComponent(buildWhatsappMessage(formData, savedOrder));
     const links = buildWhatsappLinks(String(formData.get("adminPhone")).replace(/\D/g, ""), message);
-    cart.clear(); orderForm.reset(); renderCart(); closeOrderModal();
+    
+    // 1. Bersihkan keranjang
+    cart.clear(); 
+    saveCartToStorage(); 
+    
+    // 2. BERSIHKAN DRAFT BIODATA KARENA SUDAH SUKSES
+    localStorage.removeItem('kopiFachrindahBiodata');
+    
+    orderForm.reset(); 
+    renderCart(); 
+    closeOrderModal();
     window.location.href = isAndroidDevice() ? links.appUrl : links.waMeUrl;
   } catch (error) { 
     alert("Error menyimpan order. Pastikan Supabase Anda terkonfigurasi dengan benar."); 
@@ -947,7 +1076,23 @@ if (reviewForm) {
   });
 }
 
-backToTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+backToTop.addEventListener("click", () => {
+  const searchPanel = document.querySelector(".search-panel");
+  const searchInput = document.getElementById("menuSearch");
+  
+  if (searchPanel && searchInput) {
+    // 1. Geser layar dengan halus ke arah kotak pencarian
+    searchPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+    
+    // 2. Otomatis aktifkan kursor di dalam kotak pencarian setelah layar selesai bergeser
+    setTimeout(() => {
+      searchInput.focus({ preventScroll: true });
+    }, 400); 
+  } else {
+    // Fallback/cadangan: jika kotak pencarian tidak ditemukan, kembali ke fungsi awal
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+});
 
 renderTestimonials();
 renderMenu();
@@ -1136,3 +1281,71 @@ if (iosInstallModal) {
     }
   });
 }
+
+// ==========================================
+// FITUR AUTO-SAVE BIODATA (ANTI-REFRESH FORM)
+// ==========================================
+const biodataFieldIds = [
+  "modalCustomerName", 
+  "modalCustomerPhone", 
+  "searchCityInput", 
+  "modalCustomerAddress", 
+  "modalOrderNote",
+  // Backup untuk form halaman utama (jika ada)
+  "customerName", 
+  "customerPhone", 
+  "customerAddress", 
+  "orderNote"
+];
+
+function saveBiodataToStorage() {
+  const savedData = {};
+  biodataFieldIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) savedData[id] = el.value;
+  });
+  localStorage.setItem('kopiFachrindahBiodata', JSON.stringify(savedData));
+}
+
+function loadBiodataFromStorage() {
+  const saved = localStorage.getItem('kopiFachrindahBiodata');
+  if (saved) {
+    try {
+      const savedData = JSON.parse(saved);
+      biodataFieldIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && savedData[id]) {
+          el.value = savedData[id];
+        }
+      });
+    } catch(e) {}
+  }
+}
+
+// Pasang sensor di setiap kolom: Setiap kali user mengetik, langsung di-save otomatis!
+biodataFieldIds.forEach(id => {
+  const el = document.getElementById(id);
+  if (el) {
+    el.addEventListener('input', saveBiodataToStorage);
+  }
+});
+
+// Panggil fungsi load saat web pertama kali dimuat
+document.addEventListener("DOMContentLoaded", () => {
+  loadBiodataFromStorage();
+});
+
+// ==========================================
+// FITUR PERINGATAN ANTI-REFRESH (MENCEGAH KELUAR TIDAK SENGAJA)
+// ==========================================
+window.addEventListener("beforeunload", function (event) {
+  const proofInput = document.getElementById("modalPaymentProof");
+  const hasFile = proofInput && proofInput.files && proofInput.files.length > 0;
+  
+  // Jika keranjang ada isinya ATAU pelanggan sudah mengupload bukti transfer
+  if (cart.size > 0 || hasFile) {
+    // Memunculkan pop-up peringatan bawaan browser
+    event.preventDefault();
+    event.returnValue = ""; 
+  }
+});

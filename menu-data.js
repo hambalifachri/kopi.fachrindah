@@ -3,10 +3,11 @@
 // Edit nilai name, price, group, brand, dan kategori di sini.
 
 const STORE_CONFIG_DATA = {
-  isManualClosed: false, // Ubah tulisan 'false' menjadi 'true' jika kamu mau tutup toko mendadak.
-  manualClosedMessage: "Maaf, saat ini toko sedang tutup sementara. Silakan kembali lagi nanti.",
+  // Ganti 'false' menjadi 'true' jika ingin menutup toko secara spesifik
+  isKopkenClosed: false, // <-- Saklar khusus Kopi Kenangan
+  isForeClosed: false,   // <-- Saklar khusus Fore Coffee
   
-  // Fitur Tutup Otomatis setiap Jumat (Jam 12:00 - 12:59)
+  manualClosedMessage: "Maaf, saat ini toko sedang tutup sementara. Silakan kembali lagi nanti.",
   autoJumatan: true 
 };
 
@@ -173,14 +174,145 @@ const MENU_ITEMS_DATA = [
   // KATEGORI PROMO 50K (Total 8 Paket)
   // ==========================================
   { 
-    id: "bundle-50k-1", group: "promo-50k", name: "Paket 50K 1 (Vanilla Latte + Choco Chip Cookies + Sugar Donut)", 
-    oldPrice: 36000, price: 33000, kind: "food", color: "#bd6427",
-    bundleImages: ["menu_34.jpg", "menu_119.jpg", "menu_116.jpg"] 
+    id: "bundle-50k-1", group: "promo-50k", name: "Paket 50K 1", desc: "Vanilla Latte + Choco Chip Cookies + Sugar Donut (Bisa Ganti Item)", 
+    oldPrice: 36000, price: 33000, color: "#bd6427",
+    bundleImages: ["menu_34.jpg", "menu_119.jpg", "menu_116.jpg"],
+    // 👇 TAMBAHKAN BAGIAN INI UNTUK KUSTOMISASI MANUAL 👇
+    options: [
+      // ===================================
+      // PENGATURAN ITEM 1
+      // ===================================
+      {
+        key: "minuman1",
+        label: "Pilihan Minuman 1",
+        options: [
+          { value: "(Sesuai Paket) Vanilla Latte", label: "(Sesuai Paket) Vanilla Latte" },
+          { value: "Ganti Mocha Caramel", label: "Ganti Mocha Caramel" },
+          { value: "Ganti Caramel Latte", label: "Ganti Caramel Latte" },
+          { value: "Ganti Hazelnut Latte", label: "Ganti Hazelnut Latte" },
+          { value: "Ganti Matcha Espresso", label: "Ganti Matcha Espresso" },
+          { value: "Ganti Milk Oreo Crumble", label: "Ganti Milk Oreo Crumble" },
+          { value: "Ganti Oreo Shake", label: "Ganti Oreo Shake" },
+          { value: "Ganti Dutch Chocolate", label: "Ganti Dutch Chocolate" }
+        ]
+      },
+      {
+        key: "ice1",
+        label: "Ice Level (Minuman 1)",
+        options: [
+          { value: "Normal Ice", label: "Normal Ice" },
+          { value: "Less Ice", label: "Less Ice" },
+          { value: "No Ice", label: "No Ice" }
+        ]
+      },
+      {
+        key: "sugar1",
+        label: "Sugar Level (Minuman 1)",
+        options: [
+          { value: "Normal Sugar", label: "Normal Sugar" },
+          { value: "Less Sugar", label: "Less Sugar" }
+        ]
+      },
+
+      // ===================================
+      // PENGATURAN ITEM 2
+      // ===================================
+      {
+        key: "makanan2",
+        label: "Pilihan Makanan 2",
+        options: [
+          { value: "(Sesuai Paket) Choco Chip Cookies", label: "(Sesuai Paket) Choco Chip Cookies" }
+        ]
+      },
+
+      // ===================================
+      // PENGATURAN ITEM 3 (Contoh Makanan)
+      // ===================================
+      {
+        key: "makanan3",
+        label: "Pilihan Makanan",
+        options: [
+          { value: "(Sesuai Paket) Sugar Donut", label: "(Sesuai Paket) Sugar Donut" }
+        ]
+      }
+    ]
+    // 👆 SAMPAI SINI 👆
   },
-  { 
-    id: "bundle-50k-2", group: "promo-50k", name: "Paket 50K 2 (Kenangan Milk Tea + Americano + Strawberry Choux Puff)", 
-    oldPrice: 35000, price: 32000, kind: "food", color: "#bf8a56",
-    bundleImages: ["menu_68.jpg", "menu_40.jpg", "menu_96.jpg"] 
+
+{ 
+    id: "bundle-50k-2", group: "promo-50k", name: "Paket 50K 2", desc: "Milk Tea + Americano + Puff (Bisa Ganti Item)", 
+    oldPrice: 35000, price: 32000, color: "#bf8a56",
+    bundleImages: ["menu_68.jpg", "menu_40.jpg", "menu_96.jpg"],
+    
+    // 👇 KUSTOMISASI BUNDLE FULL LENGKAP 👇
+    options: [
+      // ===================================
+      // PENGATURAN ITEM 1
+      // ===================================
+      {
+        key: "minuman1",
+        label: "Pilihan Minuman 1",
+        options: [
+          { value: "Sesuai Paket (Kenangan Milk Tea)", label: "Sesuai Paket (Kenangan Milk Tea)" },
+          { value: "Ganti OG Aren Speculoos Latte", label: "Ganti OG Aren Speculoos Latte" },
+          { value: "Ganti Toffee Nut Aren Latte", label: "Ganti Toffee Nut Aren Latte" },
+          { value: "Ganti Kopi Susu Black Aren", label: "Ganti Kopi Susu Black Aren" }
+        ]
+      },
+      {
+        key: "ice1",
+        label: "Ice Level (Minuman 1)",
+        options: [
+          { value: "Normal Ice", label: "Normal Ice" },
+          { value: "Less Ice", label: "Less Ice" },
+          { value: "No Ice", label: "No Ice" }
+        ]
+      },
+      {
+        key: "sugar1",
+        label: "Sugar Level (Minuman 1)",
+        options: [
+          { value: "Normal Sugar", label: "Normal Sugar" },
+          { value: "Less Sugar", label: "Less Sugar" }
+        ]
+      },
+
+      // ===================================
+      // PENGATURAN ITEM 2
+      // ===================================
+      {
+        key: "minuman2",
+        label: "Pilihan Minuman 2",
+        options: [
+          { value: "Americano (Sesuai Paket)", label: "Americano (Sesuai Paket)" },
+          { value: "Ganti Fresh Lemonade", label: "Ganti Fresh Lemonade" },
+          { value: "Ganti Lemon Black Tea", label: "Ganti Lemon Black Tea" }
+        ]
+      },
+      {
+        key: "ice2",
+        label: "Ice Level (Minuman 2)",
+        options: [
+          { value: "Normal Ice", label: "Normal Ice" },
+          { value: "Less Ice", label: "Less Ice" }
+        ]
+      },
+      // (Bisa tambah Sugar Level 2 di sini jika perlu)
+
+      // ===================================
+      // PENGATURAN ITEM 3 (Contoh Makanan)
+      // ===================================
+      {
+        key: "makanan3",
+        label: "Pilihan Makanan",
+        options: [
+          { value: "Strawberry Choux Puff (Sesuai Paket)", label: "Strawberry Choux Puff (Sesuai Paket)" },
+          { value: "Ganti Chocolate Choux Puff", label: "Ganti Chocolate Choux Puff" },
+          { value: "Ganti Salt Bread Choco Butter", label: "Ganti Salt Bread Choco Butter" }
+        ]
+      }
+    ]
+    // 👆 SAMPAI SINI 👆
   },
   { 
     id: "bundle-50k-3", group: "promo-50k", name: "Paket 50K 3 (Kopi Kenangan Mantan + Babyccino + Chocolate Choux Puff)", 
@@ -293,10 +425,107 @@ const MENU_ITEMS_DATA = [
   },
 
   // Kategori: Baru!
-  { id: "og-thai-tea", group: "baru", name: "OG Thai Tea", oldPrice: 19000, price: 12500, largePrice: 16500, jumboPrice: 23500, allowOatside: false, noSugar: true, color: "#e56d17", foam: "#fff1df", drizzle: "#d35c19", isNew: true, noHot: false },
-  { id: "thai-tea-loaded", group: "baru", name: "Thai Tea Loaded", oldPrice: 27000, price: 16000, largePrice: 16500, allowBeans: false, allowOatside: false, noSugar: true, color: "#cf6b20", foam: "#fff4e5", drizzle: "#5b2f1b", isNew: true, noRegular: true, noHot: true },
-  { id: "thai-tea-aren", group: "baru", name: "Thai Tea Aren", oldPrice: 24000, price: 15000, largePrice: 15000, jumboPrice: 22000, allowBeans: false, allowOatside: false, color: "#bd5b1d", foam: "#f4d09c", drizzle: "#7c3f1f", isNew: true, noSugar: true, noRegular: true },
-  { id: "thai-tea-coffee", group: "baru", name: "Thai Tea Coffee", oldPrice: 25000, price: 15500, largePrice: 15500, jumboPrice: 22500, allowBeans: true, allowOatside: false, color: "#7d3d1d", foam: "#f6d6ab", drizzle: "#e27521", isNew: true, noRegular: true, noSugar: true },
+  { 
+    id: "blueberry-americano", 
+    group: "baru", 
+    name: "Blueberry Americano", 
+    oldPrice: 19000, 
+    price: 12500, 
+    largePrice: 19500, 
+    jumboPrice: 29500, 
+    allowOatside: false, 
+    allowBeans: true, 
+    noSugar: false, 
+    color: "#e56d17", 
+    foam: "#fff1df", 
+    drizzle: "#d35c19", 
+    isNew: true, 
+    noHot: true, 
+    isBestSeller: true, 
+    onlyNormalIce: true 
+  },
+
+  { 
+    id: "blueberry-frappe", 
+    group: "baru", 
+    name: "Blueberry Frappe", 
+    oldPrice: 23000, 
+    price: 14500, 
+    largePrice: 21500, 
+    jumboPrice: 31500, 
+    allowOatside: false, 
+    allowBeans: false, 
+    noSugar: false, 
+    color: "#e56d17", 
+    foam: "#fff1df", 
+    drizzle: "#d35c19", 
+    isNew: true, 
+    noHot: true, 
+    isBestSeller: true, 
+    onlyNormalIce: true 
+  },
+
+{ 
+    id: "chocoberry-frappe", 
+    group: "baru", 
+    name: "Chocoberry Frappe", 
+    oldPrice: 27000, 
+    price: 16500, 
+    largePrice: 23500, 
+    jumboPrice: 33500, 
+    allowOatside: true, 
+    allowBeans: false, 
+    noSugar: false, 
+    color: "#e56d17", 
+    foam: "#fff1df", 
+    drizzle: "#d35c19", 
+    isNew: true, 
+    noHot: true, 
+    isBestSeller: true, 
+    onlyNormalIce: true 
+  },
+
+  {
+    id: "coffeeberry-frappe", 
+    group: "baru", 
+    name: "Coffeeberry Frappe", 
+    oldPrice: 25000, 
+    price: 15500, 
+    largePrice: 22500, 
+    jumboPrice: 32500, 
+    allowOatside: false, 
+    allowBeans: true, 
+    noSugar: false, 
+    color: "#e56d17", 
+    foam: "#fff1df", 
+    drizzle: "#d35c19", 
+    isNew: true, 
+    noHot: true, 
+    isBestSeller: true, 
+    onlyNormalIce: true 
+  },
+
+  {
+    id: "salt-bread-choco-butter", 
+    group: "baru", 
+    name: "Salt Bread Choco Butter", 
+    kind: "food",
+    oldPrice: 12000, 
+    price: 9000, 
+    isNew: true, 
+    isBestSeller: true
+  },
+
+   {
+    id: "salt-bread-sausage", 
+    group: "baru", 
+    name: "Salt Bread Sausage", 
+    kind: "food",
+    oldPrice: 15000, 
+    price: 10500, 
+    isNew: true, 
+    isBestSeller: true
+  },
 
   // Kategori: Coffee
   { id: "thai-tea-coffee-coffee", group: "coffee", name: "Thai Tea Coffee", oldPrice: 25000, price: 15500, largePrice: 15500, jumboPrice: 22500, allowBeans: true, allowOatside: true, color: "#7d3d1d", foam: "#f6d6ab", drizzle: "#e27521", isNew: true, noRegular: true, noSugar: true },
@@ -330,12 +559,12 @@ const MENU_ITEMS_DATA = [
 
   // Kategori: Non-Coffee
   { id: "nc-og-thai-tea", group: "non-coffee", name: "OG Thai Tea", oldPrice: 19000, price: 12500, largePrice: 16500, jumboPrice: 23500, allowOatside: false, noSugar: true, color: "#e56d17", foam: "#fff1df", drizzle: "#d35c19", isNew: true, noHot: false },
-  { id: "nc-thai-tea-loaded", group: "non-coffee", name: "Thai Tea Loaded", isBestSeller: true, oldPrice: 27000, price: 16000, largePrice: 16500, allowBeans: false, allowOatside: false, noSugar: true, color: "#cf6b20", foam: "#fff4e5", drizzle: "#5b2f1b", isNew: true, noRegular: true, noHot: true },
+  { id: "nc-thai-tea-loaded", group: "non-coffee", name: "Thai Tea Loaded", isBestSeller: false, oldPrice: 27000, price: 16000, largePrice: 16500, allowBeans: false, allowOatside: false, noSugar: true, color: "#cf6b20", foam: "#fff4e5", drizzle: "#5b2f1b", noRegular: true, noHot: true },
   { id: "nc-thai-tea-aren", group: "non-coffee", name: "Thai Tea Aren", oldPrice: 24000, price: 15000, largePrice: 15000, jumboPrice: 22000, allowBeans: false, allowOatside: false, color: "#bd5b1d", foam: "#f4d09c", drizzle: "#7c3f1f", isNew: true, noSugar: true, noRegular: true },
   { id: "og-aren-milky-speculoos", group: "non-coffee", name: "OG Aren Milky Speculoos", oldPrice: 23000, price: 16000, largePrice: 16000, jumboPrice: 23000, allowBeans: false, allowOatside: false, color: "#d7a36c", foam: "#fff2dc", drizzle: "#76401f", noSugar: true, noRegular: true },
   { id: "choco-caramel", group: "non-coffee", name: "Choco Caramel", oldPrice: 19000, price: 13000, largePrice: 20000, jumboPrice: 30000, allowOatside: true, color: "#71402c", foam: "#f5d4bd", drizzle: "#3b1c12", noSugar: true },
   { id: "toffee-nut-choco-macchiato", group: "non-coffee", name: "Toffee Nut Choco Macchiato", oldPrice: 22000, price: 15000, allowBeans: false, allowOatside: true, color: "#7a4027", foam: "#f0d1a6", drizzle: "#b17428", noSugar: true },
-  { id: "butterscotch-sea-salt-macchiato", group: "non-coffee", name: "Butterscotch Sea Salt Macchiato", soldOutUntil: "2026-05-30T17:00",isBestSeller: true, oldPrice: 22000, price: 15000, allowBeans: false, allowOatside: true, color: "#e3bd82", foam: "#fff3db", drizzle: "#bd7b32" },
+  { id: "butterscotch-sea-salt-macchiato", group: "non-coffee", name: "Butterscotch Sea Salt Macchiato", soldOutUntil: "2026-12-30T17:00",isBestSeller: false, oldPrice: 22000, price: 15000, allowBeans: false, allowOatside: true, color: "#e3bd82", foam: "#fff3db", drizzle: "#bd7b32" },
   { id: "milk-oreo-crumble", group: "non-coffee", name: "Milk Oreo Crumble", oldPrice: 26000, price: 17000, allowBeans: false, allowOatside: true, color: "#f6f2e9", foam: "#ffffff", drizzle: "#111111", noHot: true },
   { id: "babyccino", group: "non-coffee", name: "Babyccino", oldPrice: 19000, price: 13000, allowBeans: false, allowOatside: true, color: "#f0dfc2", foam: "#fff8ef", drizzle: "#bc7b28" },
   { id: "fresh-lemonade", group: "non-coffee", name: "Fresh Lemonade", oldPrice: 17000, price: 11500, largePrice: 11500, jumboPrice: 21500, allowOatside: false, color: "#f4d23c", foam: "#fff2a5", drizzle: "#e6aa18", noHot: true, noRegular: true },
@@ -959,5 +1188,11 @@ const PRODUCT_IMAGES_DATA = {
   "choco-chip-cookies": "menu_119.jpg",
   "join-the-dark-side-cookie": "menu_120.jpg",
   "friend-chip-cookie": "menu_119.jpg",
+  "blueberry-americano": "menu_121.jpg",
+  "blueberry-frappe": "menu_122.jpg",
+  "chocoberry-frappe": "menu_123.jpg",
+  "coffeeberry-frappe": "menu_124.jpg",
+  "salt-bread-choco-butter": "menu_125.jpg",
+  "salt-bread-sausage": "menu_126.jpg",
 };
 
