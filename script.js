@@ -1,4 +1,49 @@
 // ==========================================
+// KONEKSI DINAMIS SUPABASE (MINIMAL ORDER)
+// ==========================================
+// URL sudah dibersihkan (tanpa /rest/v1/)
+const MY_SUPABASE_URL = "https://bpkpydfvevlktyeapunf.supabase.co"; 
+const MY_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwa3B5ZGZ2ZXZsa3R5ZWFwdW5mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1ODc2NTQsImV4cCI6MjA5NTE2MzY1NH0.GTnmA5rAfRwH_tDchpxtXXM6TmRpFaK0yOW5jRyVhY4";
+
+// Variabel bawaan
+let kopkenMinOrder = 3; 
+
+async function fetchStoreSettings() {
+  try {
+    // Pastikan library dari HTML sudah terbaca
+    if (!window.supabase) return; 
+    
+    // Buat client khusus untuk membaca settingan
+    const mySupabase = window.supabase.createClient(MY_SUPABASE_URL, MY_SUPABASE_ANON_KEY);
+    
+    // Ambil data dari tabel app_settings
+    const { data, error } = await mySupabase
+      .from('app_settings')
+      .select('kopken_min_order')
+      .limit(1);
+
+    if (error) {
+       console.log("Abaikan jika tabel belum dibuat di Supabase:", error.message);
+       return; 
+    }
+
+    if (data && data.length > 0) {
+      kopkenMinOrder = data[0].kopken_min_order;
+      console.log("⚡ Aturan minimal order hari ini dari Supabase:", kopkenMinOrder);
+    }
+  } catch (error) {
+    console.warn("Gagal memuat aturan, menggunakan minimal bawaan (3).", error.message);
+  }
+}
+
+// Jalankan saat web dibuka
+fetchStoreSettings();
+
+// ==========================================
+// (Lanjut ke kode Anda di bawahnya...)
+// ==========================================
+
+// ==========================================
 // PENGATURAN STATUS TOKO (BUKA / TUTUP)
 // ==========================================
 const storeConfig = STORE_CONFIG_DATA;
@@ -288,12 +333,11 @@ function getKenanganOptionGroups(item) {
         ],
   });
 
-groups.push({
+  groups.push({
     key: "ice",
     label: "Ice Level",
     hiddenValue: "No Ice",
     dependsOn: { key: "temperature", value: "Ice" },
-    // LOGIKA BARU: Cek apakah menu ini dikunci es-nya
     options: item.onlyNormalIce 
       ? [
           { value: "Normal Ice", label: "Normal Ice" }
@@ -305,8 +349,41 @@ groups.push({
         ],
   });
 
+  // 👇 KOTAK 1: KHUSUS TOPPING (+6000) 👇
+  groups.push({
+    key: "topping",
+    label: "Topping",
+    options: [
+      { value: "Tanpa Topping", label: "Tanpa Topping" },
+      { value: "Espresso Shot Kenangan Blend", label: "Espresso Shot Kenangan Blend", priceDelta: 6000 },
+      { value: "Espresso Shot Juwara Beans", label: "Espresso Shot Juwara Beans", priceDelta: 6000 },
+      { value: "Golden Boba", label: "Golden Boba", priceDelta: 6000 },
+      { value: "Grass Jelly", label: "Grass Jelly", priceDelta: 6000 },
+      { value: "Oreo", label: "Oreo", priceDelta: 6000 },
+      { value: "Whipped Cream Chocolate", label: "Whipped Cream Chocolate", priceDelta: 6000 },
+      { value: "Whipped Cream Vanilla", label: "Whipped Cream Vanilla", priceDelta: 6000 },
+      { value: "Caramel Crumble", label: "Caramel Crumble", priceDelta: 6000 },
+      { value: "Gula Aren", label: "Gula Aren", priceDelta: 6000 }
+    ],
+  });
+
+  // 👇 KOTAK 2: KHUSUS ADD ON (+6000) 👇
+  groups.push({
+    key: "addon",
+    label: "Add On",
+    options: [
+      { value: "Tanpa Add On", label: "Tanpa Add On" },
+      { value: "Vanilla Syrup", label: "Vanilla Syrup", priceDelta: 6000 },
+      { value: "Hazelnut Syrup", label: "Hazelnut Syrup", priceDelta: 6000 },
+      { value: "Caramel Syrup", label: "Caramel Syrup", priceDelta: 6000 },
+      { value: "Salted Caramel Sauce", label: "Salted Caramel Sauce", priceDelta: 6000 },
+      { value: "Choco Sauce", label: "Choco Sauce", priceDelta: 6000 },
+      { value: "Butterscotch Sauce", label: "Butterscotch Sauce", priceDelta: 6000 }
+    ],
+  });
+
   return groups;
-}
+} 
 
 function cloneOptionGroups(groups) {
   return (groups || []).map((group) => ({
@@ -868,21 +945,94 @@ function buildWhatsappMessage(formData, savedOrder) {
   const entries = [...cart.values()];
   const subtotal = entries.reduce((total, item) => total + item.price * item.qty, 0);
   
-  // Format pesanan dengan enter, nomor urut, huruf tebal, dan indentasi
-  const orderLines = entries.map((item, index) => {
-    // Ambil opsi kustom jika ada
-    const ops = item.options && Object.keys(item.options).length > 0
-      ? `\n${formatOptionsForWA(item.options)}`
-      : "";
-      
-    // Format: 1. *2x Kopi Susu* (Fore)
-    return `${index + 1}. *${item.qty}x ${item.name}* (${getBrandById(item.brand).shortLabel})${ops}`;
-  }).join("\n\n"); // Enter 2x antar menu agar tidak berdempetan
+  // Hitung TOTAL HARGA ASLI
+  const originalSubtotal = entries.reduce((total, item) => {
+    const originalItem = menuItems.find((m) => m.id === item.id);
+    if (originalItem && originalItem.oldPrice && originalItem.oldPrice > originalItem.price) {
+      const selisihDiskon = originalItem.oldPrice - originalItem.price;
+      const hargaAsliUtuh = item.price + selisihDiskon;
+      return total + (hargaAsliUtuh * item.qty);
+    }
+    return total + (item.price * item.qty);
+  }, 0);
 
   const brandName = getCartBrandName() || getActiveBrand().label;
+  const isKopken = getCartBrandId() === 'kopi-kenangan';
+  
+  let orderLinesText = "";
 
-  // Rangkai seluruh pesan dengan format Bold (*) dan Italic (_)
-  return [
+  if (isKopken) {
+    let flattenedItems = [];
+    entries.forEach(item => {
+      const originalItem = menuItems.find(m => m.id === item.id);
+      const selisihDiskon = (originalItem && originalItem.oldPrice && originalItem.oldPrice > originalItem.price) 
+                            ? (originalItem.oldPrice - originalItem.price) : 0;
+      const actualUnitPrice = item.price + selisihDiskon;
+      
+      for (let i = 0; i < item.qty; i++) {
+        flattenedItems.push({ ...item, actualUnitPrice: actualUnitPrice, qty: 1 });
+      }
+    });
+
+    let buckets = [ [], [], [] ];
+    let bucketTotals = [ 0, 0, 0 ];
+    
+    // 👇 KUNCI RAHASIA CUAN: Batch 2 diset 50.000 agar tidak bablas melewati 60.000 👇
+    let targets = [ 70000, 50000, 0 ]; 
+    let currentBucket = 0;
+
+    for (let item of flattenedItems) {
+      // Jika keranjang sudah tembus target minimal, langsung pindah ke keranjang berikutnya
+      if (currentBucket < 2 && bucketTotals[currentBucket] >= targets[currentBucket]) {
+        currentBucket++;
+      }
+      buckets[currentBucket].push(item);
+      bucketTotals[currentBucket] += item.actualUnitPrice; 
+    }
+
+    const paketLabels = [
+      "📦 *Order Batch 1*", 
+      "📦 *Order Batch 2*", 
+      "📦 *Order Batch 3*"
+    ];
+    
+    let stringPaket = [];
+
+    buckets.forEach((bucket, index) => {
+      if (bucket.length === 0) return; 
+      
+      let groupedBucket = [];
+      bucket.forEach(bItem => {
+        let existing = groupedBucket.find(g => g.cartKey === bItem.cartKey);
+        if (existing) {
+          existing.qty += 1;
+        } else {
+          groupedBucket.push({ ...bItem, qty: 1 }); 
+        }
+      });
+
+      let lines = groupedBucket.map((item, i) => {
+        const ops = item.options && Object.keys(item.options).length > 0
+          ? `\n${formatOptionsForWA(item.options)}`
+          : "";
+        return `${i + 1}. *${item.qty}x ${item.name}* (@${rupiah.format(item.actualUnitPrice)})${ops}`;
+      }).join("\n\n");
+
+      stringPaket.push(`${paketLabels[index]}\n${lines}\n\n_*Total Asli Batch ${index + 1}: ${rupiah.format(bucketTotals[index])}*_`);
+    });
+
+    orderLinesText = stringPaket.join("\n\n-----------------------------------\n\n");
+    
+  } else {
+    orderLinesText = entries.map((item, index) => {
+      const ops = item.options && Object.keys(item.options).length > 0
+        ? `\n${formatOptionsForWA(item.options)}`
+        : "";
+      return `${index + 1}. *${item.qty}x ${item.name}* (${getBrandById(item.brand).shortLabel})${ops}`;
+    }).join("\n\n");
+  }
+
+  const messageLines = [
     "Halo admin kopi.fachrindah, ada pesanan *JASDOR* baru! 🚀", 
     "",
     `*ID Order:* ${savedOrder.id}`, 
@@ -891,16 +1041,25 @@ function buildWhatsappMessage(formData, savedOrder) {
     `*WhatsApp:* ${formData.get("customerPhone")}`, 
     `*Lokasi Outlet:* ${formData.get("customerAddress")}`, 
     "", 
-    "📦 *DAFTAR PESANAN:*",
-    "-----------------------------------",
-    orderLines, 
-    "-----------------------------------",
-    `*TOTAL SEMENTARA: ${rupiah.format(subtotal)}*`, 
-    "_Catatan Harga: Jika harga outlet berbeda, mohon konfirmasi selisihnya terlebih dahulu sebelum diproses._", 
+    "🛒 *DAFTAR PESANAN:*",
+    "===================================",
+    orderLinesText, 
+    "==================================="
+  ];
+
+  if (originalSubtotal > subtotal) {
+    messageLines.push(`*Total Harga Asli Semua: ~${rupiah.format(originalSubtotal)}~*`);
+  }
+
+  messageLines.push(
+    `*TOTAL BAYAR: ${rupiah.format(subtotal)}*`, 
+    "_Catatan: Jika harga outlet berbeda, mohon konfirmasi selisihnya terlebih dahulu._", 
     "",
     `*Catatan Pembeli:* ${formData.get("orderNote") || "-"}`,
     `*Bukti Transfer:* ${savedOrder.proof.url}`
-  ].join("\n");
+  );
+
+  return messageLines.join("\n");
 }
 
 function buildWhatsappLinks(adminPhone, encodedMessage) {
@@ -929,13 +1088,20 @@ function renderSavedReview(review) {
 
 function renderTestimonials() {
   if (!testimonialGallery) return;
+  
+  // 1. Ambil daftar gambarnya
   const images = Array.isArray(window.TESTIMONIAL_IMAGES) && window.TESTIMONIAL_IMAGES.length
     ? window.TESTIMONIAL_IMAGES
     : fallbackTestimonialImages;
 
+  // 2. PUTAR BALIK URUTANNYA (Dari yang paling akhir ke awal)
+  const reversedImages = [...images].reverse();
+
   testimonialGallery.dataset.source = images === fallbackTestimonialImages ? "fallback" : "manifest";
   testimonialGallery.dataset.count = String(images.length);
-  testimonialGallery.innerHTML = images.map((src, index) => (
+  
+  // 3. Render menggunakan gambar yang sudah diputar balik
+  testimonialGallery.innerHTML = reversedImages.map((src, index) => (
     `<img src="${src}" alt="Testimoni WhatsApp ${index + 1}" loading="lazy" />`
   )).join("");
 }
@@ -1023,11 +1189,13 @@ goCheckoutButton.addEventListener("click", () => {
   const hasBundling = [...cart.values()].some(item => item.group && item.group.includes("promo"));
   const isForeCoffee = cartBrandId === "fore";
 
-  if (totalQty >= 2 || hasBundling || isForeCoffee) { 
+  // 👇 SISTEM AKAN MEMBACA ANGKA TERBARU DARI SUPABASE 👇
+  const minimalBeli = kopkenMinOrder; 
+
+  if (totalQty >= minimalBeli || hasBundling || isForeCoffee) { 
     setModalStage("checkout"); 
   } else {
-    // Teks yang diperbarui
-    alert(`Pesanan kamu baru ${totalQty} menu.\nMinimal untuk Kopi Kenangan adalah 2 item (Bisa gabung makanan/bundle).\nUntuk Fore, tidak ada minimal pesanan.`);
+    alert(`Pesanan kamu baru ${totalQty} menu.\nMinimal untuk Kopi Kenangan saat ini adalah ${minimalBeli} item (Bisa gabung makanan/bundle).\nUntuk Fore, tidak ada minimal pesanan.`);
   }
 });
 
