@@ -939,25 +939,27 @@ function formatOptionsForWA(options) {
 
 function buildWhatsappMessage(formData, savedOrder) {
   const entries = [...cart.values()];
-  const subtotal = entries.reduce((total, item) => total + item.price * item.qty, 0);
+  // Menghitung subtotal asli dari master data (oldPrice)
+  const subtotal = entries.reduce((total, item) => {
+    const originalItem = menuItems.find(m => m.id === item.id);
+    const hargaAsli = (originalItem && originalItem.oldPrice > 0) ? originalItem.oldPrice : item.price;
+    return total + (hargaAsli * item.qty);
+  }, 0);
   
   const brandName = getCartBrandName() || getActiveBrand().label;
   const isKopken = getCartBrandId() === 'kopi-kenangan';
   
   let orderLinesText = "";
+  let finalTotalBayar = 0;
 
   if (isKopken) {
     let flattenedItems = [];
     entries.forEach(item => {
-      // Ambil referensi master data untuk mendapatkan harga asli
       const originalItem = menuItems.find(m => m.id === item.id);
-      
-      // LOGIKA: Gunakan oldPrice jika ada, jika tidak gunakan harga promo (item.price)
-      // Ini memastikan total batch dihitung dari harga yang paling "awal"
-      const hargaUntukBatch = (originalItem && originalItem.oldPrice > 0) ? originalItem.oldPrice : item.price;
+      const batchPrice = (originalItem && originalItem.oldPrice > 0) ? originalItem.oldPrice : item.price;
       
       for (let i = 0; i < item.qty; i++) {
-        flattenedItems.push({ ...item, actualUnitPrice: item.price, batchPrice: hargaUntukBatch, qty: 1 });
+        flattenedItems.push({ ...item, actualUnitPrice: item.price, batchPrice: batchPrice, qty: 1 });
       }
     });
 
@@ -967,14 +969,13 @@ function buildWhatsappMessage(formData, savedOrder) {
     let currentBucket = 0;
 
     for (let item of flattenedItems) {
-      // Gunakan item.batchPrice untuk hitungan batas 60rb
-      if (bucketTotals[currentBucket] + item.batchPrice > MAX_BATCH_LIMIT) {
+      if (bucketTotals[currentBucket] + item.batchPrice > MAX_BATCH_LIMIT && buckets[currentBucket].length > 0) {
         currentBucket++;
         buckets.push([]);
         bucketTotals.push(0);
       }
       buckets[currentBucket].push(item);
-      bucketTotals[currentBucket] += item.batchPrice; // Total batch sekarang pakai harga asli
+      bucketTotals[currentBucket] += item.batchPrice; 
     }
 
     let stringPaket = buckets.map((bucket, index) => {
@@ -987,37 +988,36 @@ function buildWhatsappMessage(formData, savedOrder) {
 
       let lines = groupedBucket.map((item, i) => {
         const originalItem = menuItems.find((m) => m.id === item.id);
-        const ops = item.options && Object.keys(item.options).length > 0
-          ? `\n${formatOptionsForWA(item.options)}`
-          : "";
+        const ops = item.options && Object.keys(item.options).length > 0 ? `\n${formatOptionsForWA(item.options)}` : "";
         
         let priceDisplay = `(*${rupiah.format(item.actualUnitPrice)}*)`;
         if (originalItem && originalItem.oldPrice && originalItem.oldPrice > 0) {
           priceDisplay = `(~${rupiah.format(originalItem.oldPrice)}~ *${rupiah.format(item.actualUnitPrice)}*)`;
         }
-
         return `${i + 1}. *${item.qty}x ${item.name}* ${priceDisplay}${ops}`;
       }).join("\n\n");
 
-      return `📦 *Order Batch ${index + 1}*\n${lines}\n\n_*Total Batch ${index + 1}: ${rupiah.format(bucketTotals[index])}*_`;
+      const totalAsliBatch = bucket.reduce((sum, it) => sum + it.batchPrice, 0);
+      const totalBayarBatch = bucket.reduce((sum, it) => sum + it.actualUnitPrice, 0);
+      const totalDisplay = `(~${rupiah.format(totalAsliBatch)}~ *${rupiah.format(totalBayarBatch)}*)`;
+
+      return `📦 *Order Batch ${index + 1}*\n${lines}\n\n_*Total Batch ${index + 1}: ${totalDisplay}*_`;
     });
 
     orderLinesText = stringPaket.join("\n\n-----------------------------------\n\n");
+    finalTotalBayar = entries.reduce((total, item) => total + (item.price * item.qty), 0);
     
   } else {
     orderLinesText = entries.map((item, index) => {
       const originalItem = menuItems.find((m) => m.id === item.id);
-      const ops = item.options && Object.keys(item.options).length > 0
-        ? `\n${formatOptionsForWA(item.options)}`
-        : "";
-      
+      const ops = item.options && Object.keys(item.options).length > 0 ? `\n${formatOptionsForWA(item.options)}` : "";
       let priceDisplay = `(*${rupiah.format(item.price)}*)`;
       if (originalItem && originalItem.oldPrice && originalItem.oldPrice > 0) {
         priceDisplay = `(~${rupiah.format(originalItem.oldPrice)}~ *${rupiah.format(item.price)}*)`;
       }
-
       return `${index + 1}. *${item.qty}x ${item.name}* ${priceDisplay}${ops}`;
     }).join("\n\n");
+    finalTotalBayar = entries.reduce((total, item) => total + (item.price * item.qty), 0);
   }
 
   const messageLines = [
@@ -1032,7 +1032,8 @@ function buildWhatsappMessage(formData, savedOrder) {
     "===================================",
     orderLinesText, 
     "===================================",
-    `*TOTAL BAYAR: ${rupiah.format(subtotal)}*`, 
+    `*Total Harga Asli Semua: ${rupiah.format(subtotal)}*`,
+    `*TOTAL BAYAR: ${rupiah.format(finalTotalBayar)}*`, 
     "_Catatan: Jika harga outlet berbeda, mohon konfirmasi selisihnya terlebih dahulu._", 
     "",
     `*Catatan Pembeli:* ${formData.get("orderNote") || "-"}`,
