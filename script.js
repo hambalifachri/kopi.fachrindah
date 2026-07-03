@@ -243,6 +243,7 @@ function renderBrandTabs() {
       <span>${escapeHtml(brand.description)}</span>
     </button>`;
   }).join("");
+  updatePromoLabelVisibility();
 }
 
 function getCartBrandId() {
@@ -601,9 +602,9 @@ clearCartButton.addEventListener("click", () => { cart.clear(); saveCartToStorag
         <div class="info-content" style="background: #fff; padding: 24px; border-radius: 12px; max-width: 90%; width: 400px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: popUpAnim 0.3s ease-out;">
           <h2 style="color: #d94b3d; margin-bottom: 15px; margin-top: 0;">📢 Info Pemesanan</h2>
           <div style="text-align: left; margin-bottom: 20px; font-size: 0.95rem; color: #444; line-height: 1.5;">
-            <p style="margin-bottom: 12px;"><strong>☕ Kopi Kenangan:</strong><br>Minimal pemesanan <strong>2 item</strong> (Bisa digabung dengan menu makanan/promo).</p>
-            <p style="margin: 0;"><strong>🍃 Fore Coffee:</strong><br>Tidak ada minimal pesanan (Bebas pesan 1 item saja).</p>
-          </div>
+<p style="margin-bottom: 12px;"><strong>☕ Kopi Kenangan:</strong><br>Pesan 1 item tetap bisa, namun dikenakan biaya layanan Rp2.000. Hemat biaya dengan pesan 2 item atau lebih.</p>
+  <p style="margin: 0;"><strong>🍃 Fore Coffee:</strong><br>Tidak ada biaya layanan tambahan (Bebas pesan 1 item saja).</p>
+</div>
           <button id="closeWelcomeBtn" class="send-button" style="width: 100%; border-radius: 999px;">Saya Mengerti</button>
         </div>
       </div>
@@ -695,7 +696,10 @@ function renderMenu(query = "") {
 function renderCart() {
   const entries = [...cart.values()];
   const subtotal = entries.reduce((total, item) => total + item.price * item.qty, 0);
-  const targetCartHtml = entries.length === 0
+  const serviceFee = getServiceFee();
+  const grandTotal = subtotal + serviceFee;
+
+  let targetCartHtml = entries.length === 0
     ? '<p class="empty">Pilih menu dari price list untuk mulai order.</p>'
     : entries.map((item) => {
         const optionsText = formatOptions(item.options);
@@ -703,28 +707,43 @@ function renderCart() {
         return `<div class="cart-line"><div><h3>${item.name}</h3><span>${rupiah.format(item.price)} x ${item.qty}</span>${optionsText ? `<small class="cart-options">${optionsText}</small>` : ""}</div><div class="quantity"><button class="qty-button" type="button" data-action="decrease" data-id="${safeCartKey}">-</button><strong>${item.qty}</strong><button class="qty-button" type="button" data-action="increase" data-id="${safeCartKey}">+</button></div></div>`;
       }).join("");
 
+  // Tambahkan baris biaya layanan ke dalam modal jika ada
+  if (serviceFee > 0) {
+    targetCartHtml += `<div class="cart-line" style="border-top: 1px dashed #ccc; margin-top: 10px; padding-top: 10px;">
+      <div><strong>Biaya Layanan (Order < 2)</strong></div>
+      <div><strong>${rupiah.format(serviceFee)}</strong></div>
+    </div>`;
+  }
+
   if (modalCartItems) modalCartItems.innerHTML = targetCartHtml;
   if (mainCartItems) mainCartItems.innerHTML = targetCartHtml;
 
   subtotalEl.textContent = rupiah.format(subtotal);
-  grandTotalEl.textContent = rupiah.format(subtotal);
+  grandTotalEl.textContent = rupiah.format(grandTotal); // Gunakan grandTotal
+  
   const totalQty = entries.reduce((total, item) => total + item.qty, 0);
   openCartButton.hidden = totalQty === 0;
   openCartCount.textContent = `${totalQty} menu`;
-  openCartTotal.textContent = rupiah.format(subtotal);
-  renderCheckoutSummary(entries, subtotal);
+  openCartTotal.textContent = rupiah.format(grandTotal);
+  renderCheckoutSummary(entries, subtotal, serviceFee, grandTotal);
 }
 
-function renderCheckoutSummary(entries, subtotal) {
+function renderCheckoutSummary(entries, subtotal, serviceFee, grandTotal) {
   if (!checkoutSummary) return;
   if (entries.length === 0) {
     checkoutSummary.innerHTML = '<p class="empty">Keranjang masih kosong.</p>';
     return;
   }
-  checkoutSummary.innerHTML = `<div class="checkout-lines">${entries.map((item) => {
-    const optionsText = formatOptions(item.options);
-    return `<div><span>${item.name} x${item.qty}</span><strong>${rupiah.format(item.price * item.qty)}</strong>${optionsText ? `<small>${optionsText}</small>` : ""}</div>`;
-  }).join("")}</div><div class="checkout-total"><span>Total bayar</span><strong>${rupiah.format(subtotal)}</strong></div>`;
+  let html = `<div class="checkout-lines">${entries.map((item) => {
+    return `<div><span>${item.name} x${item.qty}</span><strong>${rupiah.format(item.price * item.qty)}</strong></div>`;
+  }).join("")}</div>`;
+
+  if (serviceFee > 0) {
+    html += `<div><span>Biaya Layanan</span><strong>${rupiah.format(serviceFee)}</strong></div>`;
+  }
+
+  html += `<div class="checkout-total"><span>Total bayar</span><strong>${rupiah.format(grandTotal)}</strong></div>`;
+  checkoutSummary.innerHTML = html;
 }
 
 function formatOptions(options) {
@@ -1039,6 +1058,15 @@ function buildWhatsappMessage(formData, savedOrder) {
     `*Catatan Pembeli:* ${formData.get("orderNote") || "-"}`,
     `*Bukti Transfer:* ${savedOrder.proof.url}`
   ];
+
+  // Di dalam buildWhatsappMessage, tambahkan baris ini sebelum messageLines.join
+const serviceFee = getServiceFee();
+const totalFinal = finalTotalBayar + serviceFee;
+
+if (serviceFee > 0) {
+  messageLines.push(`*Biaya Layanan (Order < 2): ${rupiah.format(serviceFee)}*`);
+}
+messageLines.push(`*TOTAL BAYAR: ${rupiah.format(totalFinal)}*`);
 
   return messageLines.join("\n");
 }
@@ -1500,3 +1528,26 @@ window.addEventListener("beforeunload", function (event) {
     event.returnValue = ""; 
   }
 });
+
+function getServiceFee() {
+  const totalQty = getCartQuantity();
+  const isKopken = getCartBrandId() === 'kopi-kenangan';
+  
+  // Jika di bawah 2 item dan brand Kopi Kenangan, kenakan biaya 2000
+  if (isKopken && totalQty < 2 && totalQty > 0) {
+    return 2000;
+  }
+  return 0;
+}
+
+function updatePromoLabelVisibility() {
+  const promoLabel = document.getElementById('promoLabel');
+  if (!promoLabel) return;
+
+  // Jika brand aktif adalah 'kopi-kenangan', tampilkan. Jika bukan (misal: 'fore'), sembunyikan total.
+  if (activeBrandId === 'kopi-kenangan') {
+    promoLabel.style.display = 'block'; 
+  } else {
+    promoLabel.style.display = 'none'; // Benar-benar hilang dari layout
+  }
+}
