@@ -1533,9 +1533,13 @@ function getServiceFee() {
   const totalQty = getCartQuantity();
   const isKopken = getCartBrandId() === 'kopi-kenangan';
   
-  // Jika di bawah 2 item dan brand Kopi Kenangan, kenakan biaya 2000
-  if (isKopken && totalQty < 2 && totalQty > 0) {
-    return 2000;
+  // CEK APAKAH ADA MENU PROMO/BUNDLE DI KERANJANG
+  const hasBundling = [...cart.values()].some(item => item.group && item.group.includes("promo"));
+  
+  // Jika brand Kopi Kenangan, pesan < 2 item, TIDAK ADA BUNDLING, dan keranjang tidak kosong
+  // Maka baru dikenakan biaya 3000
+  if (isKopken && totalQty > 0 && totalQty < 2 && !hasBundling) {
+    return 3000;
   }
   return 0;
 }

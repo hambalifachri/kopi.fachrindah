@@ -175,7 +175,7 @@ const MENU_ITEMS_DATA = [
   // ==========================================
   { 
     id: "bundle-50k-1", group: "promo-50k", name: "Paket 50K 1", desc: "Vanilla Latte + Choco Chip Cookies + Sugar Donut (Bisa Ganti Item)", 
-    oldPrice: 36000, price: 33000, color: "#bd6427",
+    oldPrice: 50000, price: 33000, color: "#bd6427",
     bundleImages: ["menu_34.jpg", "menu_119.jpg", "menu_116.jpg"],
     // 👇 TAMBAHKAN BAGIAN INI UNTUK KUSTOMISASI MANUAL 👇
     options: [
@@ -241,7 +241,7 @@ const MENU_ITEMS_DATA = [
 
 { 
     id: "bundle-50k-2", group: "promo-50k", name: "Paket 50K 2", desc: "Milk Tea + Americano + Puff (Bisa Ganti Item)", 
-    oldPrice: 35000, price: 32000, color: "#bf8a56",
+    oldPrice: 50000, price: 32000, color: "#bf8a56",
     bundleImages: ["menu_68.jpg", "menu_40.jpg", "menu_96.jpg"],
     
     // 👇 KUSTOMISASI BUNDLE FULL LENGKAP 👇
@@ -315,28 +315,177 @@ const MENU_ITEMS_DATA = [
     // 👆 SAMPAI SINI 👆
   },
   { 
-    id: "bundle-50k-3", group: "promo-50k", name: "Paket 50K 3 (Kopi Kenangan Mantan + Babyccino + Chocolate Choux Puff)", 
-    oldPrice: 34500, price: 31500, kind: "food", color: "#8d4a27",
-    bundleImages: ["menu_20.jpg", "menu_65.jpg", "menu_103.jpg"] 
+        id: "bundle-50k-3", group: "promo-50k", name: "Paket 50K 3", desc: "Kopi Kenangan Mantan + Babyccino + Chocolate Choux Puff (Bisa Ganti Item)", 
+    oldPrice: 50000, price: 31500, color: "#bf8a56",
+    bundleImages: ["menu_20.jpg", "menu_65.jpg", "menu_103.jpg"],
+    
+    // 👇 KUSTOMISASI BUNDLE FULL LENGKAP 👇
+    options: [
+      // ===================================
+      // PENGATURAN ITEM 1
+      // ===================================
+      {
+        key: "minuman1",
+        label: "Pilihan Minuman 1",
+        options: [
+          { value: "Sesuai Paket (Kopi Kenangan Mantan)", label: "Sesuai Paket (Kopi Kenangan Mantan)" },
+          { value: "Ganti Toffee Nut Latte", label: "Ganti Toffee Nut Latte" },
+          { value: "Ganti Pistachio Aren Latte", label: "Ganti Pistachio Aren Latte" },
+          { value: "Ganti Spanish Latte", label: "Ganti Spanish Latte" },
+          { value: "Ganti OG Thai Tea", label: "Ganti OG Thai Tea" },
+          { value: "Ganti Choco Caramel", label: "Ganti Choco Caramel" },
+          { value: "Ganti Babyccino", label: "Ganti Babyccino" },
+          { value: "Ganti Blueberry Americano", label: "Ganti Blueberry Americano" }
+        ]
+      },
+      {
+        key: "ice1",
+        label: "Ice Level (Minuman 1)",
+        options: [
+          { value: "Normal Ice", label: "Normal Ice" },
+          { value: "Less Ice", label: "Less Ice" },
+          { value: "No Ice", label: "No Ice" }
+        ]
+      },
+      {
+        key: "sugar1",
+        label: "Sugar Level (Minuman 1)",
+        options: [
+          { value: "Normal Sugar", label: "Normal Sugar" },
+          { value: "Less Sugar", label: "Less Sugar" }
+        ]
+      },
+
+      // ===================================
+      // PENGATURAN ITEM 2
+      // ===================================
+      {
+        key: "minuman2",
+        label: "Pilihan Minuman 2",
+        options: [
+          { value: "Babyccino (Sesuai Paket)", label: "Babyccino (Sesuai Paket)" },
+          { value: "Ganti Toffee Nut Latte", label: "Ganti Toffee Nut Latte" },
+          { value: "Ganti Pistachio Aren Latte", label: "Ganti Pistachio Aren Latte" },
+          { value: "Ganti Spanish Latte", label: "Ganti Spanish Latte" },
+          { value: "Ganti OG Thai Tea", label: "Ganti OG Thai Tea" },
+          { value: "Ganti Choco Caramel", label: "Ganti Choco Caramel" },
+          { value: "Ganti Kopi Kenangan Mantan", label: "Ganti Kopi Kenangan Mantan" },
+          { value: "Ganti Blueberry Americano", label: "Ganti Blueberry Americano" }
+        ]
+      },
+      {
+        key: "ice2",
+        label: "Ice Level (Minuman 2)",
+        options: [
+          { value: "Normal Ice", label: "Normal Ice" },
+          { value: "Less Ice", label: "Less Ice" }
+        ]
+      },
+      {
+        key: "sugar2",
+        label: "Sugar Level (Minuman 2)",
+        options: [
+          { value: "Normal Sugar", label: "Normal Sugar" },
+          { value: "Less Sugar", label: "Less Sugar" }
+        ]
+      },
+      // (Bisa tambah Sugar Level 2 di sini jika perlu)
+
+      // ===================================
+      // PENGATURAN ITEM 3 (Contoh Makanan)
+      // ===================================
+      {
+        key: "makanan3",
+        label: "Pilihan Makanan",
+        options: [
+          { value: "Chocolate Choux Puff (Sesuai Paket)", label: "Chocolate Choux Puff (Sesuai Paket)" },
+          { value: "Ganti Strawberry Choux Puff", label: "Ganti Strawberry Choux Puff" },
+          { value: "Ganti Salt Bread Choco Butter", label: "Ganti Salt Bread Choco Butter" }
+        ]
+      }
+    ]
   },
   { 
-    id: "bundle-50k-4", group: "promo-50k", name: "Paket 50K 4 (Tiramisu Frappe + Donut Almond + Roti Coklat Klasik)", 
-    oldPrice: 35000, price: 32000, kind: "food", color: "#6d3b2a",
-    bundleImages: ["menu_79.jpg", "menu_108.jpg", "menu_117.jpg"] 
+        id: "bundle-50k-4", group: "promo-50k", name: "Paket 50K 4", desc: "Tiramisu Frappe + Donut Almond + Roti Coklat Klasik (Bisa Ganti Item)", 
+    oldPrice: 50000, price: 32000, color: "#bf8a56",
+    bundleImages: ["menu_79.jpg", "menu_108.jpg", "menu_117.jpg"],
+    
+    // 👇 KUSTOMISASI BUNDLE FULL LENGKAP 👇
+    options: [
+      // ===================================
+      // PENGATURAN ITEM 1
+      // ===================================
+      {
+        key: "minuman1",
+        label: "Pilihan Minuman 1",
+        options: [
+          { value: "Sesuai Paket (Tiramisu Frappe)", label: "Sesuai Paket (Tiramisu Frappe)" },
+          { value: "Ganti Dua Shot Iced Shaken", label: "Ganti Dua Shot Iced Shaken" },
+          { value: "Ganti Caramel Macchiato", label: "Ganti Caramel Macchiato" },
+          { value: "Ganti Mocha Latte", label: "Ganti Mocha Latte" },
+          { value: "Ganti Avocado Coffee", label: "Ganti Avocado Coffee" },
+          { value: "Ganti Avocado Caramel", label: "Ganti Avocado Caramel" },
+          { value: "Ganti Caramel Dutch Choco", label: "Ganti Caramel Dutch Choco" },
+          { value: "Ganti Hazelnut Dutch Choco", label: "Ganti Hazelnut Dutch Choco" }
+        ]
+      },
+      {
+        key: "ice1",
+        label: "Ice Level (Minuman 1)",
+        options: [
+          { value: "Normal Ice", label: "Normal Ice" },
+          { value: "Less Ice", label: "Less Ice" },
+          { value: "No Ice", label: "No Ice" }
+        ]
+      },
+      {
+        key: "sugar1",
+        label: "Sugar Level (Minuman 1)",
+        options: [
+          { value: "Normal Sugar", label: "Normal Sugar" },
+          { value: "Less Sugar", label: "Less Sugar" }
+        ]
+      },
+
+      // ===================================
+      // PENGATURAN ITEM 2
+      // ===================================
+      {
+        key: "makanan2",
+        label: "Pilihan Makanan 2",
+        options: [
+          { value: "Donut Almond (Sesuai Paket)", label: "Donut Almond (Sesuai Paket)" },
+          { value: "Ganti Canele Original", label: "Ganti Canele Original" },
+          { value: "Ganti Roti Keju Manis", label: "Ganti Roti Keju Manis" }
+        ]
+      },
+      // (Bisa tambah Sugar Level 2 di sini jika perlu)
+
+      // ===================================
+      // PENGATURAN ITEM 3 (Contoh Makanan)
+      // ===================================
+      {
+        key: "makanan3",
+        label: "Pilihan Makanan 3",
+        options: [
+          { value: "Chocolate Choux Puff (Sesuai Paket)", label: "Chocolate Choux Puff (Sesuai Paket)" }
+        ]
+      }
+    ]
   },
   { 
     id: "bundle-50k-5", group: "promo-50k", name: "Paket 50K 5 (Avocado Milk + Roti Gulung Abon + Roti Coklat Klasik)", 
-    oldPrice: 36000, price: 33000, kind: "food", color: "#b4cf49",
+    oldPrice: 50000, price: 33000, kind: "food", color: "#b4cf49",
     bundleImages: ["menu_57.jpg", "menu_99.jpg", "menu_117.jpg"] 
   },
   { 
     id: "bundle-50k-6", group: "promo-50k", name: "Paket 50K 6 (Raspberry Hibiscus + Tiramisu Latte + Sugar Donut)", 
-    oldPrice: 35500, price: 32500, kind: "food", color: "#df253c",
+    oldPrice: 50000, price: 32500, kind: "food", color: "#df253c",
     bundleImages: ["menu_71.jpg", "menu_25.jpg", "menu_116.jpg"] 
   },
   { 
     id: "bundle-50k-7", group: "promo-50k", name: "Paket 50K 7 (Matcha Latte + Canele Aren + Sugar Donut)", 
-    oldPrice: 36000, price: 33000, kind: "food", color: "#4f9c3c",
+    oldPrice: 50000, price: 33000, kind: "food", color: "#4f9c3c",
     bundleImages: ["menu_73.jpg", "menu_93.jpg", "menu_116.jpg"] 
   },
 
@@ -345,43 +494,43 @@ const MENU_ITEMS_DATA = [
   // ==========================================
   { 
     id: "bundle-60k-1", group: "promo-60k", name: "Paket 60K 1 (Caramel Macchiato + Cappuccino + Sugar Donut)", 
-    oldPrice: 39000, price: 36000, kind: "food", color: "#bd6a2d",
+    oldPrice: 60000, price: 36000, kind: "food", color: "#bd6a2d",
     bundleImages: ["menu_23.jpg", "menu_41.jpg", "menu_116.jpg"] 
   },
   { 
     id: "bundle-60k-2", group: "promo-60k", name: "Paket 60K 2 (Matcha Kenangan Frappe + Kopi Kenangan Mantan + Roti Coklat Klasik)", 
-    oldPrice: 40000, price: 37000, kind: "food", color: "#69a63b",
+    oldPrice: 60000, price: 37000, kind: "food", color: "#69a63b",
     bundleImages: ["menu_81.jpg", "menu_20.jpg", "menu_117.jpg"] 
   },
   { 
     id: "bundle-60k-3", group: "promo-60k", name: "Paket 60K 3 (Vanilla Kenangan Frappe + Hazelnut Choco Milk Tea + Roti Keju Manis)", 
-    oldPrice: 42500, price: 40000, kind: "food", color: "#f5f0e7",
+    oldPrice: 60000, price: 40000, kind: "food", color: "#f5f0e7",
     bundleImages: ["menu_83.jpg", "menu_55.jpg", "menu_118.jpg"] 
   },
   { 
     id: "bundle-60k-4", group: "promo-60k", name: "Paket 60K 4 (Oreo Shake + Kopi Susu Black Aren + Canele Original)", 
-    oldPrice: 40000, price: 37000, kind: "food", color: "#f1eee7",
+    oldPrice: 60000, price: 37000, kind: "food", color: "#f1eee7",
     bundleImages: ["menu_70.jpg", "menu_31.jpg", "menu_106.jpg"] 
   },
   { 
     id: "bundle-60k-5", group: "promo-60k", name: "Paket 60K 5 (Butterscotch Kenangan Frappe + Blueberry Muffin + Canele Aren)", 
-    oldPrice: 41000, price: 38000, kind: "food", color: "#d59a32",
+    oldPrice: 60000, price: 38000, kind: "food", color: "#d59a32",
     bundleImages: ["menu_80.jpg", "menu_95.jpg", "menu_93.jpg"] 
   },
   { 
     id: "bundle-60k-6", group: "promo-60k", name: "Paket 60K 6 (Thai Tea Aren + Susu Grass Jelly + Chocolate Choux Puff)", 
-    oldPrice: 40000, price: 37000, kind: "food", color: "#bd5b1d",
+    oldPrice: 60000, price: 37000, kind: "food", color: "#bd5b1d",
     bundleImages: ["menu_3.jpg", "menu_72.jpg", "menu_103.jpg"] 
   },
   { 
     id: "bundle-60k-7", group: "promo-60k", name: "Paket 60K 7 (Kopi Kenangan Mantan Frappe + Butterscotch Aren Latte + Donut Almond)", 
-    oldPrice: 42000, price: 40000, kind: "food", color: "#9f5a2f",
+    oldPrice: 60000, price: 40000, kind: "food", color: "#9f5a2f",
     bundleImages: ["menu_82.jpg", "menu_38.jpg", "menu_108.jpg"] 
   },
 
   { 
     id: "bundle-60k-large", group: "promo-60k", name: "Paket 60k (Tiramisu Latte LARGE + Cafe Malt Latte + Sugar Donut)", 
-    oldPrice: 44000, price: 41000, kind: "food", color: "#a16643",
+    oldPrice: 60000, price: 41000, kind: "food", color: "#a16643",
     bundleImages: ["menu_25.jpg", "menu_19.jpg", "menu_116.jpg"] 
   },
 
@@ -390,37 +539,37 @@ const MENU_ITEMS_DATA = [
   // ==========================================
   { 
     id: "bundle-70k-1", group: "promo-70k", name: "Paket Sultan 70K 1 (Avocado Caramel + Mocha Latte + Choco Chip Cookies)", 
-    oldPrice: 47000, price: 44000, kind: "food", color: "#afc94f",
+    oldPrice: 70000, price: 44000, kind: "food", color: "#afc94f",
     bundleImages: ["menu_56.jpg", "menu_33.jpg", "menu_119.jpg"] 
   },
   { 
     id: "bundle-70k-2", group: "promo-70k", name: "Paket Sultan 70K 2 (Matcha Kenangan Frappe + Caramel Dutch Choco + Sugar Donut)", 
-    oldPrice: 46000, price: 43000, kind: "food", color: "#69a63b",
+    oldPrice: 70000, price: 43000, kind: "food", color: "#69a63b",
     bundleImages: ["menu_81.jpg", "menu_58.jpg", "menu_116.jpg"] 
   },
   { 
     id: "bundle-70k-3", group: "promo-70k", name: "Paket Sultan 70K 3 (Caramel Dutch Choco + Thai Tea Coffee + Danish Tiramisu)", 
-    oldPrice: 46500, price: 45000, kind: "food", color: "#6b3326",
+    oldPrice: 70000, price: 45000, kind: "food", color: "#6b3326",
     bundleImages: ["menu_59.jpg", "menu_4.jpg", "menu_104.jpg"] 
   },
   { 
     id: "bundle-70k-4", group: "promo-70k", name: "Paket Sultan 70K 4 (Butterscotch Kenangan Frappe + Milo Dino + Bambang Choco Cheese)", 
-    oldPrice: 49000, price: 46000, kind: "food", color: "#d59a32",
+    oldPrice: 70000, price: 46000, kind: "food", color: "#d59a32",
     bundleImages: ["menu_80.jpg", "menu_69.jpg", "menu_109.jpg"] 
   },
   { 
     id: "bundle-70k-5", group: "promo-70k", name: "Paket Sultan 70K 5 (Dutch Choco Kenangan Frappe + Toffee Nut Oat Latte + Chocolate Croissant)", 
-    oldPrice: 47500, price: 45000, kind: "food", color: "#5a2d25",
+    oldPrice: 70000, price: 45000, kind: "food", color: "#5a2d25",
     bundleImages: ["menu_84.jpg", "menu_29.jpg", "menu_115.jpg"] 
   },
   { 
     id: "bundle-70k-6", group: "promo-70k", name: "Paket Sultan 70K 6 (Thai Tea Loaded + Milk Oreo Crumble + Aren Apple Pie)", 
-    oldPrice: 45000, price: 43000, kind: "food", color: "#cf6b20",
+    oldPrice: 70000, price: 43000, kind: "food", color: "#cf6b20",
     bundleImages: ["menu_50.jpg", "menu_64.jpg", "menu_94.jpg"] 
   },
   { 
     id: "bundle-70k-7", group: "promo-70k", name: "Paket Sultan 70K 7 (Caramel Macchiato + Avocado Coffee + Choco Chip Cookies)", 
-    oldPrice: 46000, price: 43000, kind: "food", color: "#bd6a2d",
+    oldPrice: 70000, price: 43000, kind: "food", color: "#bd6a2d",
     bundleImages: ["menu_23.jpg", "menu_35.jpg", "menu_119.jpg"] 
   },
 
@@ -572,7 +721,7 @@ const MENU_ITEMS_DATA = [
   { id: "dua-shot-og-aren", group: "coffee", name: "Dua Shot OG Aren", oldPrice: 25000, price: 16500, largePrice: 23500, allowBeans: true, allowOatside: true, noSugar: true, color: "#d7a36c", foam: "#fff2dc", drizzle: "#76401f" },
   { id: "mocha-caramel", group: "coffee", name: "Mocha Caramel", oldPrice: 26000, price: 17000, largePrice: 24000, jumboPrice: 34000, allowBeans: true, allowOatside: true, noSugar: true, color: "#70402c", foam: "#f4dcc4", drizzle: "#3b1c12" },
   { id: "cafe-malt-latte", group: "coffee", name: "Cafe Malt Latte", oldPrice: 23000, price: 15500, largePrice: 22500, color: "#2f2922", foam: "#e2c696", drizzle: "#b17a37" },
-  { id: "kopi-kenangan-mantan", group: "coffee", name: "Kopi Kenangan Mantan", isBestSeller: true, oldPrice: 19000, price: 12500, largePrice: 18500, jumboPrice: 28500, allowBeans: true, allowOatside: true, sizeBlocks: [{ size: "Large", start: "13:00", end: "17:00", label: "jam 13.00-17.00" }], color: "#8d4a27", foam: "#f3d3b1", drizzle: "#5d2d19" },
+  { id: "kopi-kenangan-mantan", group: "coffee", name: "Kopi Kenangan Mantan", isBestSeller: true, oldPrice: 19000, price: 12500, largePrice: 18500, jumboPrice: 28500, allowBeans: true, allowOatside: true, color: "#8d4a27", foam: "#f3d3b1", drizzle: "#5d2d19" },
   { id: "caramel-latte", group: "coffee", name: "Caramel Latte", oldPrice: 26000, price: 16000, largePrice: 24000, jumboPrice: 33000, allowBeans: true, allowOatside: true, color: "#b45b23", foam: "#fff0dc", drizzle: "#a04b19" },
   { id: "dua-shot-iced-shaken", group: "coffee", name: "Dua Shot Iced Shaken", oldPrice: 28000, price: 17000, largePrice: 27000, jumboPrice: 36000, allowBeans: true, allowOatside: true, noHot: true, color: "#d56419", foam: "#ffe4c6", drizzle: "#ee8d24" },
   { id: "caramel-macchiato", group: "coffee", name: "Caramel Macchiato", oldPrice: 28000, price: 17000, largePrice: 27000, jumboPrice: 36000, allowBeans: true, allowOatside: true, color: "#bd6a2d", foam: "#fff2dc", drizzle: "#a75a20" },
