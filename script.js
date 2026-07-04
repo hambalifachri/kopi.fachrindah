@@ -1552,6 +1552,6 @@ function updatePromoLabelVisibility() {
   if (activeBrandId === 'kopi-kenangan') {
     promoLabel.style.display = 'block'; 
   } else {
-    promoLabel.style.display = 'none'; // Benar-benar hilang dari layout
+    promoLabel.style.display = 'none'; // Benar-benar hilang dari layouty
   }
 }
