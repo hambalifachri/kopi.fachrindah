@@ -459,7 +459,7 @@ const MENU_ITEMS_DATA = [
           { value: "Ganti Roti Keju Manis", label: "Ganti Roti Keju Manis" }
         ]
       },
-      // (Bisa tambah Sugar Level 2 di sini jika perlu)s
+      // (Bisa tambah Sugar Level 2 di sini jika perlu)
 
       // ===================================
       // PENGATURAN ITEM 3 (Contoh Makanan)
