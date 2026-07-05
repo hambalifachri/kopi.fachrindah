@@ -972,11 +972,13 @@ function formatOptionsForWA(options) {
 
 function buildWhatsappMessage(formData, savedOrder) {
   const entries = [...cart.values()];
+  
+  // 1. Hitung Subtotal Asli (Harga Resmi)
   const subtotalAsli = entries.reduce((total, item) => {
     const originalItem = menuItems.find(m => m.id === item.id);
-    if (!originalItem) return total + (item.price * item.qty);
-    const delta = item.price - originalItem.price;
-    return total + ((originalItem.oldPrice + delta) * item.qty);
+    let basePrice = originalItem ? (originalItem.oldPrice || item.price) : item.price;
+    if (item.options && item.options.size === "Large") basePrice += 5000;
+    return total + (basePrice * item.qty);
   }, 0);
   
   const finalTotalBayar = entries.reduce((total, item) => total + (item.price * item.qty), 0);
@@ -986,16 +988,19 @@ function buildWhatsappMessage(formData, savedOrder) {
   let orderLinesText = "";
 
   if (isKopken) {
+    // Flatten item dengan menyertakan harga resmi (batchPrice)
     let flattenedItems = [];
     entries.forEach(item => {
       const originalItem = menuItems.find(m => m.id === item.id);
-      const delta = item.price - (originalItem ? originalItem.price : item.price);
-      const batchPrice = (originalItem && originalItem.oldPrice > 0) ? (originalItem.oldPrice + delta) : item.price;
+      let baseBatch = originalItem ? (originalItem.oldPrice || item.price) : item.price;
+      if (item.options && item.options.size === "Large") baseBatch += 5000;
+      
       for (let i = 0; i < item.qty; i++) {
-        flattenedItems.push({ ...item, actualUnitPrice: item.price, batchPrice: batchPrice, qty: 1 });
+        flattenedItems.push({ ...item, qty: 1, batchPrice: baseBatch });
       }
     });
 
+    // Bucket berdasarkan batchPrice (Harga Resmi) agar tidak lebih dari 60rb
     let buckets = [];
     let bucketTotals = [];
     const MAX_BATCH_LIMIT = 60000; 
@@ -1003,6 +1008,7 @@ function buildWhatsappMessage(formData, savedOrder) {
     for (let item of flattenedItems) {
       let added = false;
       for (let i = 0; i < buckets.length; i++) {
+        // PERBAIKAN: Gunakan batchPrice (harga resmi) untuk cek limit
         if (bucketTotals[i] + item.batchPrice <= MAX_BATCH_LIMIT) {
           buckets[i].push(item);
           bucketTotals[i] += item.batchPrice;
@@ -1027,53 +1033,35 @@ function buildWhatsappMessage(formData, savedOrder) {
       let lines = groupedBucket.map((item, i) => {
         const originalItem = menuItems.find((m) => m.id === item.id);
         const ops = item.options && Object.keys(item.options).length > 0 ? `\n${formatOptionsForWA(item.options)}` : "";
-        const delta = item.actualUnitPrice - (originalItem ? originalItem.price : item.actualUnitPrice);
-        const resmiProporsional = (originalItem ? originalItem.oldPrice : item.actualUnitPrice) + delta;
-        return `${i + 1}. *${item.qty}x ${item.name}* (~${rupiah.format(resmiProporsional)}~ *${rupiah.format(item.actualUnitPrice)}*)${ops}`;
+        let baseResmi = originalItem ? (originalItem.oldPrice || item.price) : item.price;
+        if (item.options && item.options.size === "Large") baseResmi += 5000;
+        return `${i + 1}. *${item.qty}x ${item.name}* (~${rupiah.format(baseResmi)}~ *${rupiah.format(item.price)}*)${ops}`;
       }).join("\n\n");
 
       const totalAsliBatch = bucket.reduce((sum, it) => sum + it.batchPrice, 0);
-      const totalBayarBatch = bucket.reduce((sum, it) => sum + it.actualUnitPrice, 0);
-      const totalDisplay = `(~${rupiah.format(totalAsliBatch)}~ *${rupiah.format(totalBayarBatch)}*)`;
-      return `📦 *Order Batch ${index + 1}*\n${lines}\n\n_*Total Batch ${index + 1}: ${totalDisplay}*_`;
+      const totalBayarBatch = bucket.reduce((sum, it) => sum + it.price, 0);
+      return `📦 *Order Batch ${index + 1}*\n${lines}\n\n_*Total Batch ${index + 1}: (~${rupiah.format(totalAsliBatch)}~ *${rupiah.format(totalBayarBatch)}*)*_`;
     }).join("\n\n-----------------------------------\n\n");
     
   } else {
+    // Logika non-kopken tetap sama
     orderLinesText = entries.map((item, index) => {
       const originalItem = menuItems.find((m) => m.id === item.id);
       const ops = item.options && Object.keys(item.options).length > 0 ? `\n${formatOptionsForWA(item.options)}` : "";
-      const delta = item.price - (originalItem ? originalItem.price : item.price);
-      const resmiProporsional = (originalItem ? originalItem.oldPrice : item.price) + delta;
-      return `${index + 1}. *${item.qty}x ${item.name}* (~${rupiah.format(resmiProporsional)}~ *${rupiah.format(item.price)}*)${ops}`;
+      let baseResmi = originalItem ? (originalItem.oldPrice || item.price) : item.price;
+      if (item.options && item.options.size === "Large") baseResmi += 5000;
+      return `${index + 1}. *${item.qty}x ${item.name}* (~${rupiah.format(baseResmi)}~ *${rupiah.format(item.price)}*)${ops}`;
     }).join("\n\n");
   }
 
+  // ... (Sisa kode untuk messageLines tetap sama) ...
   const serviceFee = getServiceFee();
   const totalFinal = finalTotalBayar + serviceFee;
-
   const messageLines = [
-    "Halo admin kopi.fachrindah, ada pesanan *JASDOR* baru! 🚀", 
-    "",
-    `*ID Order:* ${savedOrder.id}`, 
-    `*Brand:* ${brandName}`, 
-    `*Nama:* ${formData.get("customerName")}`, 
-    `*Lokasi Outlet:* ${formData.get("customerAddress")}`, 
-    "", 
-    "🛒 *DAFTAR PESANAN:*",
-    "===================================",
-    orderLinesText, 
-    "===================================",
-    `*Total Harga Asli Semua: ${rupiah.format(subtotalAsli)}*`,
-    `*TOTAL BAYAR: ${rupiah.format(finalTotalBayar)}*`, 
-    "_Catatan: Jika harga outlet berbeda, mohon konfirmasi selisihnya terlebih dahulu._", 
-    "",
-    `*Catatan Pembeli:* ${formData.get("orderNote") || "-"}`,
-    `*Bukti Transfer:* ${savedOrder.proof.url}`
+    "Halo admin kopi.fachrindah, ada pesanan *JASDOR* baru! 🚀", "", `*ID Order:* ${savedOrder.id}`, `*Brand:* ${brandName}`, `*Nama:* ${formData.get("customerName")}`, `*Lokasi Outlet:* ${formData.get("customerAddress")}`, "", "🛒 *DAFTAR PESANAN:*", "===================================", orderLinesText, "===================================", `*Total Harga Asli Semua: ${rupiah.format(subtotalAsli)}*`, `*TOTAL BAYAR: ${rupiah.format(finalTotalBayar)}*`, "_Catatan: Jika harga outlet berbeda, mohon konfirmasi selisihnya terlebih dahulu._", "", `*Catatan Pembeli:* ${formData.get("orderNote") || "-"}`, `*Bukti Transfer:* ${savedOrder.proof.url}`
   ];
-
   if (serviceFee > 0) messageLines.push(`*Biaya Layanan: ${rupiah.format(serviceFee)}*`);
   messageLines.push(`*TOTAL BAYAR: ${rupiah.format(totalFinal)}*`);
-
   return messageLines.join("\n");
 }
 
