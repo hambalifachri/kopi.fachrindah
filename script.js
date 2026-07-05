@@ -127,9 +127,17 @@ function getAutoImageFileName(item) {
 }
 
 function resolveMenuImage(item) {
+  // 1. Jika ada link gambar manual di menu-data.js, gunakan itu
   if (item.image) return item.image;
-  const imageFile = item.imageFile || productImages[item.id] || getAutoImageFileName(item);
-  return imageFile ? `assets/menu/${imageFile}` : "";
+  
+  // 2. Jika ada pemetaan di PRODUCT_IMAGES_DATA (jika nanti Anda isi), gunakan itu
+  if (typeof productImages !== 'undefined' && productImages[item.id]) {
+      return `assets/menu/${productImages[item.id]}`;
+  }
+  
+  // 3. PAKSA OTOMATIS: Gunakan brand dan nama menu untuk mencari gambar
+  // Contoh: tomoro-caffe-latte.jpg
+  return `assets/menu/${getAutoImageFileName(item)}`;
 }
 
 menuItems.forEach((item) => {
@@ -642,7 +650,7 @@ function renderMenu(query = "") {
                           activeCategories.map((category) => `<a href="#${category.id}">${escapeHtml(category.title)}</a>`).join("");
 
   let htmlOutput = bannerHtml;
-  let foundItems = new Set(); // Pakai Set agar menu yang muncul 2 kali tidak dihitung dobel saat dicari
+  let foundItems = new Set(); 
 
   // 2. Buat bagian khusus Best Seller di paling atas
   const bestSellers = activeItems.filter((item) => {
@@ -660,16 +668,23 @@ function renderMenu(query = "") {
     </section>`;
   }
 
-  // 3. Render kategori lain di bawahnya
+  // 3. Render kategori lain di bawahnya dengan logika Group Ganda (Array)
   htmlOutput += activeCategories.map((category) => {
     const categoryMatches = normalizeText(category.title).includes(normalizedQuery);
+    
     const items = activeItems.filter((item) => {
-      if (item.group !== category.id) return false;
+      // LOGIKA BARU: Cek apakah item.group adalah array ATAU string tunggal
+      const itemGroups = Array.isArray(item.group) ? item.group : [item.group];
+      
+      // Jika kategori tidak ada dalam daftar group item, skip
+      if (!itemGroups.includes(category.id)) return false;
+      
+      // Filter pencarian
       if (!normalizedQuery) return true;
       return categoryMatches || normalizeText(item.name).includes(normalizedQuery);
     });
 
-    // Urutkan item: yang Best Seller ditaruh di posisi terdepan pada masing-masing kategori
+    // Urutkan item: yang Best Seller ditaruh di depan pada masing-masing kategori
     items.sort((a, b) => (b.isBestSeller === true ? 1 : 0) - (a.isBestSeller === true ? 1 : 0));
 
     if (items.length === 0) return "";
@@ -842,7 +857,7 @@ function setModalStage(stage) {
 }
 
 function calculateItemPrice(item, options) {
-  let price = item.price;
+  let price = item.price; 
   getItemOptionGroups(item).forEach((group) => {
     const selectedValue = options[group.key];
     const selectedOption = group.options.find((option) => option.value === selectedValue);
@@ -916,17 +931,16 @@ function selectItemForOptions(id) {
 function addItem(id) {
   const item = menuItems.find((menuItem) => menuItem.id === id);
   if (!item) return;
-
   if (!canAddBrandToCart(item)) return;
 
   const options = isFoodItem(item) ? {} : getCleanSelectedOptions(item);
-  const calculatedPrice = calculateItemPrice(item, options);
+  const calculatedPrice = calculateItemPrice(item, options); // Kalkulasi ulang harga
   const cartKey = `${id}|${JSON.stringify(options)}`;
   const current = cart.get(cartKey);
 
   cart.set(cartKey, {
     ...item,
-    price: calculatedPrice,
+    price: calculatedPrice, // Pakai harga hasil hitungan
     cartKey,
     options,
     qty: current ? current.qty + 1 : 1
@@ -958,46 +972,51 @@ function formatOptionsForWA(options) {
 
 function buildWhatsappMessage(formData, savedOrder) {
   const entries = [...cart.values()];
-  // Menghitung subtotal asli dari master data (oldPrice)
-  const subtotal = entries.reduce((total, item) => {
+  const subtotalAsli = entries.reduce((total, item) => {
     const originalItem = menuItems.find(m => m.id === item.id);
-    const hargaAsli = (originalItem && originalItem.oldPrice > 0) ? originalItem.oldPrice : item.price;
-    return total + (hargaAsli * item.qty);
+    if (!originalItem) return total + (item.price * item.qty);
+    const delta = item.price - originalItem.price;
+    return total + ((originalItem.oldPrice + delta) * item.qty);
   }, 0);
   
+  const finalTotalBayar = entries.reduce((total, item) => total + (item.price * item.qty), 0);
   const brandName = getCartBrandName() || getActiveBrand().label;
   const isKopken = getCartBrandId() === 'kopi-kenangan';
   
   let orderLinesText = "";
-  let finalTotalBayar = 0;
 
   if (isKopken) {
     let flattenedItems = [];
     entries.forEach(item => {
       const originalItem = menuItems.find(m => m.id === item.id);
-      const batchPrice = (originalItem && originalItem.oldPrice > 0) ? originalItem.oldPrice : item.price;
-      
+      const delta = item.price - (originalItem ? originalItem.price : item.price);
+      const batchPrice = (originalItem && originalItem.oldPrice > 0) ? (originalItem.oldPrice + delta) : item.price;
       for (let i = 0; i < item.qty; i++) {
         flattenedItems.push({ ...item, actualUnitPrice: item.price, batchPrice: batchPrice, qty: 1 });
       }
     });
 
-    let buckets = [ [] ];
-    let bucketTotals = [ 0 ];
+    let buckets = [];
+    let bucketTotals = [];
     const MAX_BATCH_LIMIT = 60000; 
-    let currentBucket = 0;
 
     for (let item of flattenedItems) {
-      if (bucketTotals[currentBucket] + item.batchPrice > MAX_BATCH_LIMIT && buckets[currentBucket].length > 0) {
-        currentBucket++;
-        buckets.push([]);
-        bucketTotals.push(0);
+      let added = false;
+      for (let i = 0; i < buckets.length; i++) {
+        if (bucketTotals[i] + item.batchPrice <= MAX_BATCH_LIMIT) {
+          buckets[i].push(item);
+          bucketTotals[i] += item.batchPrice;
+          added = true;
+          break;
+        }
       }
-      buckets[currentBucket].push(item);
-      bucketTotals[currentBucket] += item.batchPrice; 
+      if (!added) {
+        buckets.push([item]);
+        bucketTotals.push(item.batchPrice);
+      }
     }
 
-    let stringPaket = buckets.map((bucket, index) => {
+    orderLinesText = buckets.map((bucket, index) => {
       let groupedBucket = [];
       bucket.forEach(bItem => {
         let existing = groupedBucket.find(g => g.cartKey === bItem.cartKey);
@@ -1008,36 +1027,29 @@ function buildWhatsappMessage(formData, savedOrder) {
       let lines = groupedBucket.map((item, i) => {
         const originalItem = menuItems.find((m) => m.id === item.id);
         const ops = item.options && Object.keys(item.options).length > 0 ? `\n${formatOptionsForWA(item.options)}` : "";
-        
-        let priceDisplay = `(*${rupiah.format(item.actualUnitPrice)}*)`;
-        if (originalItem && originalItem.oldPrice && originalItem.oldPrice > 0) {
-          priceDisplay = `(~${rupiah.format(originalItem.oldPrice)}~ *${rupiah.format(item.actualUnitPrice)}*)`;
-        }
-        return `${i + 1}. *${item.qty}x ${item.name}* ${priceDisplay}${ops}`;
+        const delta = item.actualUnitPrice - (originalItem ? originalItem.price : item.actualUnitPrice);
+        const resmiProporsional = (originalItem ? originalItem.oldPrice : item.actualUnitPrice) + delta;
+        return `${i + 1}. *${item.qty}x ${item.name}* (~${rupiah.format(resmiProporsional)}~ *${rupiah.format(item.actualUnitPrice)}*)${ops}`;
       }).join("\n\n");
 
       const totalAsliBatch = bucket.reduce((sum, it) => sum + it.batchPrice, 0);
       const totalBayarBatch = bucket.reduce((sum, it) => sum + it.actualUnitPrice, 0);
       const totalDisplay = `(~${rupiah.format(totalAsliBatch)}~ *${rupiah.format(totalBayarBatch)}*)`;
-
       return `📦 *Order Batch ${index + 1}*\n${lines}\n\n_*Total Batch ${index + 1}: ${totalDisplay}*_`;
-    });
-
-    orderLinesText = stringPaket.join("\n\n-----------------------------------\n\n");
-    finalTotalBayar = entries.reduce((total, item) => total + (item.price * item.qty), 0);
+    }).join("\n\n-----------------------------------\n\n");
     
   } else {
     orderLinesText = entries.map((item, index) => {
       const originalItem = menuItems.find((m) => m.id === item.id);
       const ops = item.options && Object.keys(item.options).length > 0 ? `\n${formatOptionsForWA(item.options)}` : "";
-      let priceDisplay = `(*${rupiah.format(item.price)}*)`;
-      if (originalItem && originalItem.oldPrice && originalItem.oldPrice > 0) {
-        priceDisplay = `(~${rupiah.format(originalItem.oldPrice)}~ *${rupiah.format(item.price)}*)`;
-      }
-      return `${index + 1}. *${item.qty}x ${item.name}* ${priceDisplay}${ops}`;
+      const delta = item.price - (originalItem ? originalItem.price : item.price);
+      const resmiProporsional = (originalItem ? originalItem.oldPrice : item.price) + delta;
+      return `${index + 1}. *${item.qty}x ${item.name}* (~${rupiah.format(resmiProporsional)}~ *${rupiah.format(item.price)}*)${ops}`;
     }).join("\n\n");
-    finalTotalBayar = entries.reduce((total, item) => total + (item.price * item.qty), 0);
   }
+
+  const serviceFee = getServiceFee();
+  const totalFinal = finalTotalBayar + serviceFee;
 
   const messageLines = [
     "Halo admin kopi.fachrindah, ada pesanan *JASDOR* baru! 🚀", 
@@ -1051,7 +1063,7 @@ function buildWhatsappMessage(formData, savedOrder) {
     "===================================",
     orderLinesText, 
     "===================================",
-    `*Total Harga Asli Semua: ${rupiah.format(subtotal)}*`,
+    `*Total Harga Asli Semua: ${rupiah.format(subtotalAsli)}*`,
     `*TOTAL BAYAR: ${rupiah.format(finalTotalBayar)}*`, 
     "_Catatan: Jika harga outlet berbeda, mohon konfirmasi selisihnya terlebih dahulu._", 
     "",
@@ -1059,14 +1071,8 @@ function buildWhatsappMessage(formData, savedOrder) {
     `*Bukti Transfer:* ${savedOrder.proof.url}`
   ];
 
-  // Di dalam buildWhatsappMessage, tambahkan baris ini sebelum messageLines.join
-const serviceFee = getServiceFee();
-const totalFinal = finalTotalBayar + serviceFee;
-
-if (serviceFee > 0) {
-  messageLines.push(`*Biaya Layanan (Order < 2): ${rupiah.format(serviceFee)}*`);
-}
-messageLines.push(`*TOTAL BAYAR: ${rupiah.format(totalFinal)}*`);
+  if (serviceFee > 0) messageLines.push(`*Biaya Layanan: ${rupiah.format(serviceFee)}*`);
+  messageLines.push(`*TOTAL BAYAR: ${rupiah.format(totalFinal)}*`);
 
   return messageLines.join("\n");
 }
