@@ -32,7 +32,42 @@ Foto produk disimpan di `assets/menu`. Mapping foto ke produk ada di `script.js`
 
 ## Minimal Order
 
-Minimal order adalah 2 menu. Biaya jasa tidak dihitung di aplikasi ini.
+Minimal order untuk Kopken adalah 2 item (boleh digabung dengan makanan). Untuk Fore tidak ada minimal order. Aturan ini ditegakkan otomatis berdasarkan field `store` tiap menu (lihat bagian Buka/Tutup Toko). Biaya jasa tidak dihitung di aplikasi ini.
+
+## Buka / Tutup Toko (Kopken & Fore)
+
+Status toko diatur di `script.js`, bagian paling atas:
+
+```js
+const STORE_CONFIG = {
+  kopken: { label: "Kopken", status: "open" },
+  fore: { label: "Fore", status: "open" },
+};
+```
+
+Ubah `status` menjadi `"closed"` untuk menutup salah satu toko. Menu dari toko yang tutup akan otomatis ter-disable (tombol jadi "Tutup" dan tidak bisa masuk keranjang), sedangkan toko lain tetap bisa menerima pesanan secara terpisah.
+
+Setiap menu menentukan tokonya lewat field `store`. Menu tanpa field `store` dianggap milik toko default (`DEFAULT_STORE = "kopken"`), jadi semua menu Kopi Kenangan yang ada sekarang otomatis = Kopken. Untuk menambah menu Fore, tambahkan `store: "fore"` pada item tersebut, contoh:
+
+```js
+{ id: "fore-aren-latte", group: "coffee", name: "Aren Latte (Fore)", price: 20000, store: "fore" },
+```
+
+## Bundle (Kustomisasi Minuman)
+
+Menu bundle ditandai dengan `kind: "bundle"` dan field `bundle.drinkId` (id minuman bawaan). Saat dipesan, pelanggan bisa mengganti minuman bundle, tapi hanya dengan minuman lain yang **harganya sama** dengan minuman bawaan. Contoh ada di `menuItems` (`bundle-hemat-kopi-roti`):
+
+```js
+{ id: "bundle-hemat-kopi-roti", group: "promo-combo", name: "Bundle Hemat (Kopi + Roti)", price: 24000, kind: "bundle", store: "kopken", bundle: { drinkId: "kopi-kenangan-mantan" } },
+```
+
+## Anti-Refresh (Keranjang Tersimpan)
+
+Isi keranjang otomatis disimpan di `localStorage` (key `kopiFachrindahCart`) setiap kali berubah, jadi pesanan tidak hilang kalau halaman ter-refresh sebelum submit. Storage baru dikosongkan setelah order berhasil dikirim.
+
+## Pop-up Informasi
+
+Saat halaman dibuka, muncul pop-up informasi minimal order (Kopken minimal 2 item, Fore bebas). Teks dan tombol "Mengerti" ada di `index.html` pada blok `#infoModal`.
 
 ## Pembayaran
 
